@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<head>
+<link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<title>OAS System</title>
+<!-- Bootstrap core CSS -->
+    <link href="admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<!-- Custom fonts for this template-->
+<link href="admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+<script src="admin/dashboard/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="admin/dashboard/vendor/bootstrap/jquery/jquery.min.js"></script>
+
+    <!-- Custom styles for this template-->
+    <link href="admin/dashboard/css/sb-admin.css" rel="stylesheet">
+
+<script type="text/javascript">
+function validate(form){
+
+fail = validatePassword(form.password.value)
+fail += validateUsername(form.username.value)
+
+if (fail == "") return true
+
+else{
+
+alert("Fill in the required fields"); 
+return false
+}
+}
+</script>
+
+<body>
+
+<div class="jumbotron">
+      <div class="container" align="center">
+      <h1 align="center">Online Assignment Submission</h1>
+      <p align="center">Login Page</p>
+      </div>
+ </div><!-- End of Main Jumbotron-->	
+
+
+<?php
+// Starting a sesssion variable
+session_start();
+require_once "Admin/connect.php";
+
+$user = $pass = $passwrd = $usrname = $paswrd = $position = "";
+// if user is already logged in
+if(!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos']))
+{
+	header("Location:tutor.php");
+	exit();
+}
+elseif(!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])){
+	header("Location:student.php");
+	exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+// if both username and password are entered
+if(!empty($_POST['oas_tutorId']) && !empty($_POST['oas_tutorpword']))
+{
+ $user = fix_string($_POST['oas_tutorId']);
+ $pass = fix_string($_POST['oas_tutorpword']);
+
+// Hash encryption for protecting password in the database
+$salt1 = "qm&h*";
+$salt2 = "pg!@";
+$passwrd = hash('ripemd128', "$salt1$pass$salt2");
+
+
+$query = "SELECT* FROM tutor WHERE StaffId = '$user' AND password = '$passwrd' ";
+$result = $conn->query($query);
+
+		if($result->num_rows <  1){
+		 	?>
+		 <div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+		     <?php
+
+	 	}
+
+ 		else{
+
+	     	$position = "tutor";
+			 //Creating sessions and cookies
+			 $_SESSION['oas_tutorId']=$user;
+			 $_SESSION['oas_tutorpos']=$position;
+
+			 echo "Success logging in";
+
+			header("Location:tutor.php");
+		 }
+}// End of condition if both username and password are entered.
+
+// Confirming if the current user is a student
+elseif (!empty($_POST['oas_matricNum']) && !empty($_POST['oas_studpword'])) {
+
+		$user = fix_string($_POST['oas_matricNum']);
+		$pass = fix_string($_POST['oas_studpword']);
+
+		// Hash encryption for protecting password in the database
+		$salt1 = "qm&h*";
+		$salt2 = "pg!@";
+		$passwrd = hash('ripemd128', "$salt1$pass$salt2");
+
+		$query = "SELECT* FROM student WHERE MatricNum = '$user' AND password = '$passwrd' ";
+		$result = $conn->query($query);
+
+		if($result->num_rows <  1){
+		 	?>
+			<h6 align="center">Incorrect Username or Password</h6>
+		 
+		     <?php
+	 	}
+
+ 		else{
+
+	    $_SESSION['oas_studmatricNum'] = $user;
+			$_SESSION['oas_studpos'] = "student";
+			echo "Success logging in";
+			header("Location: student.php");
+
+		 }
+	}
+
+else{
+
+	?>
+	<div class="alert-danger">
+    <span class="closebtn" onclick="location.reload();" onload="this.parentElement.style.display='none';">&times;</span> 
+    Please enter the username and password
+    </div>
+    <?php
+}
+
+}#End of validating that the request sent is a POST method
+
+function fix_string($string)
+{
+if (get_magic_quotes_gpc()) $string = stripslashes($string);
+return htmlentities ($string);
+}
+
+
+?>
+
+<body class="bg-dark">
+<!-- Div container to contain the page -->
+ <div class="container">
+
+<!-- <div class="col-md-4">
+<h3 align="center" class="display-5">Tutor Login</h3>
+<form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+
+<div class="form-group">
+<input name="oas_tutorId" type="text" class="form-control" id="username" placeholder="Enter Tutor ID" onBlur="validateUsername()">&nbsp;<span id="uname"></span>
+</div>
+
+<div class="form-group">
+<input name="oas_tutorpword" type="password" class="form-control" id="password" placeholder="Enter Password" onBlur="validatePassword()">&nbsp;<span id="pword"></span> 
+</div>
+
+<div class="col-sm-12" align="center">
+<input type="submit" value="Login" name="submit" class="btn btn-primary">
+</div>
+
+</form>
+</div> -->
+
+<div class="row">
+<div class="col-sm-6">
+<div class="card card-login mx-auto mt-5">
+        <div class="card-header">Tutor Login</div>
+        <div class="card-body">
+          <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+
+            <div class="form-group">
+              <!-- <div class="form-label-group"> -->
+                <input type="text" name="oas_tutorId" class="form-control" placeholder="Tutor Id" required="required" autofocus="autofocus">
+              <!-- <label for="inputEmail">Tutor Id</label> -->
+              <!-- </div> -->
+            </div>
+            <div class="form-group">
+              <!-- <div class="form-label-group"> -->
+                <input type="password" name="oas_tutorpword" id="inputPassword" class="form-control" placeholder="Password" required="required">
+                <!-- <label for="inputPassword">Password</label> -->
+              <!-- </div> -->
+            </div>
+            <div class="form-group">
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary btn-block">Login</button>
+          </form>
+          <div class="text-center">
+            <!-- <a class="d-block small" href="forgot-password.html">Forgot Password?</a> -->
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="col-sm-6">
+<div class="card card-login mx-auto mt-5">
+        <div class="card-header">Student Login</div>
+        <div class="card-body">
+          <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+            <div class="form-group">
+                <input type="text" name="oas_matricNum" class="form-control" placeholder="Matric number" required="required">
+            </div>
+            <div class="form-group">
+             <!--  <div class="form-label-group"> -->
+                <input type="password" name="oas_studpword" class="form-control" placeholder="Password" required="required">
+              <!-- </div> -->
+            </div>
+            <div class="form-group">
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary btn-block">Login</button>
+          </form>
+          <div class="text-center">
+            <a class="d-block small mt-3" href="registration.php">Register an Account</a>
+<!--             <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
+ -->          </div>
+        </div>
+      </div>
+      </div>
+</div>
+
+<!-- <div class="col-md-4">
+<h3 align="center" class="display-5">Student Login</h3>
+<form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+
+<div class="form-group">
+<input name="oas_matricNum" type="text" class="form-control" id="matricnum" placeholder="Enter Matric Number">
+</div>
+
+<div class="form-group">
+<input name="oas_studpword" type="password" class="form-control"  placeholder="Enter Student Password">
+</div>
+
+<div class="col-sm-12" align="center">
+<input type="submit" value="Login" name="submit" class="btn btn-primary"><br>
+<a href="registration.php">Don't have an account? Create one.</a>
+</div>
+
+</form>
+</div> -->
+
+</div>
+
+<!-- Footer -->
+<footer class="page-footer font-small blue pt-4">
+
+    <!-- Copyright -->
+    <div class="footer-copyright text-center py-3">© 2018 Copyright: OAS System
+    </div>
+    <!-- Copyright -->
+
+  </footer>
+  
+</body> 
+
+
+<script type="text/javascript">
+
+function validatePassword(){var a=document.getElementById('password').value; var b=document.getElementById('password'); if (a == "") {document.getElementById('pword').innerHTML='<font color=red size=2><i>No Password was Entered</i><font>';b.style.borderColor="red";} else if (!/[a-z]/.test(a) || ! /[A-Z]/.test(a) || !/[0-9]/.test(a)){document.getElementById('pword').innerHTML='<font size=2 color=red><i>Passwords require one each of a-z, A-Z and 0-9.</i><font>';b.style.borderColor="red";} else if (a.length  < 4) {document.getElementById('pword').innerHTML='<font color=red size=2><i>Passwords too weak</i></font>';b.style.borderColor="red";} else {document.getElementById('pword').innerHTML=""; b.style.borderColor="green"; return ""}}
+
+function validateUsername(){var a=document.getElementById('username').value; var b=document.getElementById('username'); if(a == ""){document.getElementById('uname').innerHTML='<font color=red size=2><i>No username was Entered</i><font>';b.style.borderColor="red";} else if (/[^a-zA-Z0-9_-]/.test(a)){document.getElementById('uname').innerHTML='<font size=2 color=red><i>Only a-z, A-Z, 0-9, _ and - are required</i><font>';b.style.borderColor="red";} else{document.getElementById('uname').innerHTML=""; b.style.borderColor="green"; return ""}}
+</script>
+
+
+
