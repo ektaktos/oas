@@ -158,25 +158,6 @@ return htmlentities ($string);
 <!-- Div container to contain the page -->
  <div class="container">
 
-<!-- <div class="col-md-4">
-<h3 align="center" class="display-5">Tutor Login</h3>
-<form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
-
-<div class="form-group">
-<input name="oas_tutorId" type="text" class="form-control" id="username" placeholder="Enter Tutor ID" onBlur="validateUsername()">&nbsp;<span id="uname"></span>
-</div>
-
-<div class="form-group">
-<input name="oas_tutorpword" type="password" class="form-control" id="password" placeholder="Enter Password" onBlur="validatePassword()">&nbsp;<span id="pword"></span> 
-</div>
-
-<div class="col-sm-12" align="center">
-<input type="submit" value="Login" name="submit" class="btn btn-primary">
-</div>
-
-</form>
-</div> -->
-
 <div class="row">
 <div class="col-sm-6">
 <div class="card card-login mx-auto mt-5">
@@ -233,25 +214,7 @@ return htmlentities ($string);
       </div>
 </div>
 
-<!-- <div class="col-md-4">
-<h3 align="center" class="display-5">Student Login</h3>
-<form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
 
-<div class="form-group">
-<input name="oas_matricNum" type="text" class="form-control" id="matricnum" placeholder="Enter Matric Number">
-</div>
-
-<div class="form-group">
-<input name="oas_studpword" type="password" class="form-control"  placeholder="Enter Student Password">
-</div>
-
-<div class="col-sm-12" align="center">
-<input type="submit" value="Login" name="submit" class="btn btn-primary"><br>
-<a href="registration.php">Don't have an account? Create one.</a>
-</div>
-
-</form>
-</div> -->
 
 </div>
 

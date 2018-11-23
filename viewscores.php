@@ -86,6 +86,7 @@ $resultStudent = $conn->query($queryStudent);
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -104,6 +105,13 @@ $resultStudent = $conn->query($queryStudent);
           </a>
         </li>
 
+        <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
+          </a>
+        </li>
+        
         <li class="nav-item active">
           <a class="nav-link" href="#">
             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -129,7 +137,7 @@ $resultStudent = $conn->query($queryStudent);
                   <th>Sn</th>
                   <th>Assignment Id</th>
                   <th>Course Code</th>
-                  <th>Assignment</th>
+                  <th>Assignment Answer</th>
                   <th>Status</th>
                   <th>Date Submitted</th>
                   <th>Score</th>
@@ -140,23 +148,39 @@ $resultStudent = $conn->query($queryStudent);
                 <?php
                    $sn = 1;
                   while ($row = $result->fetch_assoc()) {
-                   $filePath = $row['ass_file_path'];
-                   $arr = explode('/', $filePath);
-                   $ass_file = $arr[1];
+                  if (!empty($row['ass_file_path'])) {
+                    $filePath = $row['ass_file_path'];
+                     $arr = explode('/', $filePath);
+                     $ass_file = $arr[1];
+                     $answer = "<a href='".$filePath."'>".$ass_file."</a>";
+                  }
+                  elseif (!empty($row['ass_answer'])) {
+                    $answer = $row['ass_answer'];
+                  }
+                   
+                   $assignmentId = $row['assignmentId'];
+                   $courseCode = $row['courseCode'];
     
                     echo"<tr>";
                       echo "<td>".$sn.".</td>";
-                      echo "<td>".$row['assignmentId']."</td>";
-                      echo "<td>".$row['courseCode']."</td>";
-                      echo "<td><a href='".$filePath."'>".$ass_file."</a></td>";
+                      echo "<td>".$assignmentId."</td>";
+                      echo "<td>".str_replace('_',' ',$row['courseCode'])."</td>";
+                      echo "<td>".$answer."</td>";
                       echo "<td>".$row['status']."</td>";
                       echo "<td>".date("M j, Y",strtotime($row['date']))."</td>";
 
+                      if (strpos($assignmentId, '_') !== false) {
+                        $arr = explode('_', $assignmentId);
+                        $assId = $arr[0];
+                       }else{
+                        $assId = $assignmentId;
+                       }
+
                       if($row['status'] == 'Graded'){
-                        $query1 = "SELECT score FROM assignmentresult WHERE matricNum = '$matricNum'";
+                        $query1 = "SELECT * FROM assignmentresult WHERE matricNum = '$matricNum' AND courseCode = '$courseCode'";
                         $result1 = $conn->query($query1);
                         while ($row1 = $result1->fetch_assoc()) {
-                          echo "<td>".$row1['score']."</td>";
+                          echo "<td>".$row1[$assId]."</td>";
                        }
                       }
                       else{

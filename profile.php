@@ -1,25 +1,39 @@
 <?php
+require 'Admin/connect.php';
 // Validating that the Student is really logged in and authorized
 session_start();
 if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) {
  	# What to perform if the student is really logged in
-
-require_once 'Admin/connect.php';
 $matricNum = $_SESSION['oas_studmatricNum'];
-
-
+$id = $matricNum;
+$link = "student.php";
 $queryStudent = "SELECT* FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
 $rownum = $resultStudent->num_rows;
 
  while ($row = $resultStudent->fetch_assoc()) {
-        $studentName = $row['Name'];
+        $Name = $row['Name'];
+        $phone = $row['phone'];
+        $email = $row['email'];
+        $courses = str_replace('_',' ', $row['courses']);
+    }
+ }
+
+elseif (!empty($_SESSION['oas_tutorId'])) {
+  # What to perform if the tutor is really logged in
+$tutorId = $_SESSION['oas_tutorId'];
+$link = "tutor.php";
+$id = $tutorId;
+$queryTutor = "SELECT* FROM tutor WHERE staffId = '$tutorId'";
+$resultTutor = $conn->query($queryTutor);
+$rownum = $resultTutor->num_rows;
+
+ while ($row = $resultTutor->fetch_assoc()) {
+        $Name = $row['Name'];
         $phone = $row['phone'];
         $email = $row['email'];
         $courses = $row['courses'];
     }
-
-
  }
 
  else{
@@ -31,94 +45,205 @@ $rownum = $resultStudent->num_rows;
 
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Profile - Online Assignment Submission</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="admin/css/bootstrap.min.css" rel="stylesheet">
+    <title>Article Entry - OAS</title>
 
-    <!-- Custom styles for this template -->
-    <link href="admin/css/dashboard.css" rel="stylesheet">
+    <!-- Bootstrap core CSS-->
+    <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template-->
+    <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
+
   </head>
 
-  <body>
+  <body id="page-top">
 
-    <nav class="navbar navbar-dark navbar-fixed-top bg-inverse">
-      <button type="button" class="navbar-toggler hidden-sm-up" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+   
+      <a class="nav-brand mr-1" href="<?php echo $link; ?>" style="color: #ffffff;">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span >Dashboard</span>
+      </a>
+
+      <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+        <i class="fas fa-bars"></i>
       </button>
-      <a class="navbar-brand" href="student.php">Home</a>
-      <div id="navbar">
-        <nav class="nav navbar-nav pull-xs-left">
-          <a class="nav-item nav-link active" href="#">Profile</a>
-          <a class="nav-item nav-link" href="logout.php">Logout</a>
-         
-        </nav>
-        <span class="pull-xs-right">
-          <P>Welcome here, <?php echo $studentName; ?></P>
-        </span>
-      </div>
-    </nav>
-  <!-- Main jumbotron for -->
-    <div class="jumbotron">
-      <div class="container" align="center">
-        <h1 class="display-5">Online Assignment Submission System</h1>
-        <p>Profile</p>
-      </div>
-    </div><!-- End of Main Jumbotron-->
 
-    <div class="container-fluid" id="Assignments">
+
+      <!-- Navbar Dispaly Search bar and User Name -->
+      
+      <form class="d-none d-md-inline-block form-inline ml-auto ">
+          <input type="text" name="matricNum" class="form-control" placeholder="Enter Matric Number">
+          <input type="submit" value="Search" name="submit" class="btn">
+      </form>
+
+      <!-- Navbar -->
+      <ul class="navbar-nav ml-auto ml-md-0">
         
+        <li class="nav-item dropdown no-arrow">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user-circle fa-fw"></i><?php echo $Name;?>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="#">Profile</a>
+          </div>
+        </li>
+      </ul>
+
+    </nav>
+
+    <div id="wrapper">
+
+      <!-- Sidebar -->
+      <ul class="sidebar navbar-nav">
+      <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
+        <li class="nav-item">
+            <a href="scoresheet.php" class="nav-link">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Scoresheet</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="searchStudent.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Search Student</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="checkSubmission.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Check Submission</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="newAssignment.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>New Assignment</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="newAssignment.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>New Group Assignment</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a class="nav-link" href="articleEntry.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Article Entry</span>
+          </a>
+        </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
+          </a>
+        </li>
+        
+      <?php } elseif(!empty($_SESSION['oas_studmatricNum'])){?>
+
+        <li class="nav-item">
+          <a class="nav-link" href="registerCourse.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Register Course</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="viewscores.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>View Scores</span>
+          </a>
+        </li>
+
+       <li class="nav-item active">
+          <a class="nav-link" href="articleEntry.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Article Entry</span>
+          </a>
+        </li>
+        <?php } ?>
+
+      </ul>
+
+
+    <div class="container-fluid">
+        <table class="table" style="width: 70%; margin: 50px 0px 0px 50px">
         <?php
           if ($rownum >0) {
-                        
-              echo "<br>Name: " . $studentName ;
-              echo "<br>Matric. Number: " . $matricNum ;
-              echo "<br>Name: " . $studentName ;
-              echo "<br>Phone: " . $phone ;
-              echo "<br>Email: " . $email ;
+              echo "<tr><td>Full Name: </td><td>" . $Name ."</td></tr>";
+              echo "<tr><td>Identification Number: </td><td>" . $id ."</td></tr>";
+              echo "<tr><td>Phone: </td><td>" . $phone ."</td></tr>";
+              echo "<tr><td>Email: </td><td>" . $email ."</td></tr>";
               $course = implode(",", json_decode($courses));
-              echo "<br>Courses: " . $course;
-
-
+              echo "<tr><td>Courses: </td><td>" . $course ."</td></tr>";
 
           }
           else{
             echo "Profile not available";
           }
-
-
         ?>
+
+        </table>
 
 
     </div>
-
-    <div class="container-fluid col-sm-12">
+</div>
+    <div class="container">
     <footer class="footer">
          <hr>
        <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
       </footer>
     </div>
 
+     <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="logout.php">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
-    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
-    <script src="../../assets/js/vendor/holder.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="Admin/dashboard/vendor/jquery/jquery.min.js"></script>
+    <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

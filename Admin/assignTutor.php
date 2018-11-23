@@ -36,45 +36,36 @@ else
 
 <title>Assign Tutor</title>
 
-<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="css/index.css">
+<link href="dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 
 
 
 <body>
 	<!-- Main jumbotron for -->
-    <div class="jumbotron">
+    <div class="jumbotron" style="margin-bottom: -20px;">
       <div class="container" align="center">
         <h1 class="display-4">Online Assignment Submission System</h1>
         <p>Assign Tutor Page</p>
       </div>
     </div><!-- End of Main Jumbotron-->
      <!-- The Navigation or menu bar-->
-    <nav class="navbar navbar-dark navbar-static-top bg-inverse">
-  <a class="navbar-brand" href="adminpage.html"><img src="favicon.jpeg" height="30" width="30" class="img-circle"></a></a>
-  <ul class="nav navbar-nav nav-pills">
-        <ul class="nav navbar-nav">
-        
-        <li class="nav-item">
-          <a class="nav-link" href="newCourse.php">New Course</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="newTutor.php">New Tutor</a>
-        </li>
-
-         <li class="nav-item active">
-          <a class="nav-link" href="#">Assign tutor<span class="sr-only">(current)</span></a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Logout</a>
-        </li>
-        
-      </ul> 
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">OAS</a>
+  <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button> -->
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="newCourse.php">New Course</a>
+      <a class="nav-item nav-link" href="newTutor.php">New Tutor</a>
+      <a class="nav-item nav-link active" href="#">Assign Tutor <span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="logout.php">Logout</a>
+    </div>
+  </div>
 </nav>
-<div class="container">
+<div class="container" style="margin-top: 30px;">
 	<!-- FORM CONTROLS-->
 	<form class="form-horizontal" method="post" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 		
@@ -133,7 +124,7 @@ else
    
       <footer class="footer">
          <hr>
-       <p align="center">&copy; Developed by Alabi Wale Timothy</p>
+       <p align="center">&copy; <?php echo Date("Y");?> Oas system </p>
       </footer>
  
 </body>

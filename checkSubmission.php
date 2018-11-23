@@ -98,6 +98,7 @@ $resultTutor = $conn->query($queryTutor);
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -151,7 +152,12 @@ $resultTutor = $conn->query($queryTutor);
           </a>
         </li>
 
-
+         <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
+          </a>
+        </li>
       </ul>
 
       <div id="content-wrapper">
@@ -181,9 +187,8 @@ $resultTutor = $conn->query($queryTutor);
               <th>Sn</th>
               <th>Matric Num</th>
               <th>Status</th>
-              <th>Assignment Link</th>
               <th>Submission Date</th>
-              <th>Score</th>
+              <!-- <th>Score</th> -->
             </tr>
           </thead>
            <tbody id="assTable">

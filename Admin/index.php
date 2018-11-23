@@ -6,9 +6,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>MiniFinance</title>
+<title>OAS</title>
 <!-- Bootstrap core CSS -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
 <body>
 
@@ -123,7 +123,7 @@ return htmlentities ($string);
 <div class="col-sm-12">
     <footer class="footer">
          <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
+       <p align="center">&copy; <?php echo Date("Y");?> Oas system </p>
       </footer>
 </div>
 

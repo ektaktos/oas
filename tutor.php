@@ -92,7 +92,7 @@ $resultTutor = $conn->query($queryTutor);
       </form>
 
       <!-- Navbar -->
-      <ul class="navbar-nav ml-auto ml-md-0">
+     <ul class="navbar-nav ml-auto ml-md-0">
         
         <li class="nav-item dropdown no-arrow">
           <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -101,6 +101,7 @@ $resultTutor = $conn->query($queryTutor);
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -154,6 +155,12 @@ $resultTutor = $conn->query($queryTutor);
           </a>
         </li>
 
+        <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
+          </a>
+        </li>
 
       </ul>
 
@@ -164,69 +171,69 @@ $resultTutor = $conn->query($queryTutor);
           <!-- Breadcrumbs-->
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
-              <a href="#">Assignments</a>
+              Assignments
             </li>
-            <li class="breadcrumb-item active">Ungraded</li>
+            <li class="breadcrumb-item active"><a href="assignment.php?page=ungraded">Ungraded</a></li>
           </ol>
-          <div class="row">
-
+          <div class="">
+            <table width="auto" class="table table-hover table-responsive" style="margin-top: 30px;">
+            <thead class="thead-light">
+            <tr>
+              <th>Sn</th>
+              <th>Assignment Id</th>
+              <th>Course Code</th>
+              <th>Matric Number</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
           <?php
-             
+             $sn = 1;
               while ($row = $resultSubmAssignment->fetch_assoc()) {
-                
                 $assignmentId = $row['assignmentId'];
-                $courseCode = $row['courseCode'];
                 $matricnum = $row['matricNum'];
-                $ass_path = $row['ass_file_path'];
-
-                $arr = explode('/', $ass_path);
-                $ass_file = $arr[1];
-
-              echo "<div class='col-xl-4 col-sm-4 mb-3'>";
-              echo "<div class='card text-white bg-success o-hidden h-100'>";
-                echo "<div class='card-body'>";
-                  echo "<div class='card-body-icon'>";
-                    echo "<i class='fas fa-fw fa-comments'></i>";
-                  echo "</div>";
-                  echo "<div class='mr-5'>
-                  <h5 align='center'>Assignment has not been graded</h5>
-                  <span>Assignment Id: ".$assignmentId."</span><br>
-                   <span>Course Code: ".$courseCode."</span><br>
-                  <span class='fileName'>Submitted File: ".$ass_file."</span><br>
-                  <span class='fileDetails'> Matric Num: ".$matricnum."</span><br>
-                  </div>";
-                echo "</div>";
-                echo "<a class='card-footer text-white clearfix small z-1' href='gradeAssignment.php?Id=".$assignmentId."&matric=".$matricnum."'>";
-                  echo "<span class='float-left'>View Details</span>";
-                  echo "<span class='float-right'>";
-                    echo "<i class='fas fa-angle-right'></i>";
-                  echo "</span>";
-                echo "</a>";
-              echo "</div>";
-            echo "</div>";
-              
+                echo"<tr>";
+                echo "<td>".$sn.".</td>";
+                echo "<td>".$assignmentId."</td>";
+                echo "<td>".str_replace('_', ' ',$row['courseCode'])."</td>";
+                echo "<td>".$matricnum."</td>";
+                echo "<td>".$row['date']."</td>";
+                echo "<td><a href='gradeAssignment.php?Id=".$assignmentId."&matric=".$matricnum."'>Grade</a></td>";
+                echo "</tr>";
+                $sn+=1;            
               }
           ?>
+        </tbody>
+      </table>
           </div>
 
           <!-- Breadcrumbs-->
-          <ol class="breadcrumb">
+          <!-- <ol class="breadcrumb">
             <li class="breadcrumb-item">
-              <a href="#">Assignments</a>
+              Assignments
             </li>
-            <li class="breadcrumb-item active">Graded</li>
+            <li class="breadcrumb-item active"><a href="assignment.php?page=graded">Graded</a></li>
           </ol>
 
-          <div class="row">
-
+          <div class="">
+            <table width="auto" class="table table-hover table-responsive" style="margin-top: 30px;">
+            <thead class="thead-light">
+            <tr>
+              <th>Sn</th>
+              <th>Assignment Id</th>
+              <th>Course Code</th>
+              <th>Matric Number</th>
+              <th>Score</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
           <?php
-             
               while ($row = $resultSubmAssignment1->fetch_assoc()) {
-
                 $assignmentId = $row['assignmentId'];
-                $courseCode = $row['courseCode'];
                 $matricnum = $row['matricNum'];
-                $ass_path = $row['ass_file_path'];
+                $courseCode = $row['courseCode'];
 
                 $queryAssDetails = "SELECT assignmentQuestion,score FROM assignmentdetails WHERE assignmentId='$assignmentId'";
                 $resultAssDetails = $conn->query($queryAssDetails);
@@ -243,39 +250,31 @@ $resultTutor = $conn->query($queryTutor);
                 while ($row = $resultscore->fetch_assoc()) {
                     $obtScore = $row['score'];
                 }
-                            
-              echo "<div class='col-xl-3 col-sm-3 mb-3'>";
-              echo "<div class='card text-white bg-success o-hidden h-100'>";
-                echo "<div class='card-body'>";
-                  echo "<div class='card-body-icon'>";
-                    echo "<i class='fas fa-fw fa-comments'></i>";
-                  echo "</div>";
-                  echo "<div class='mr-5'>
-                  <span>Ass. Id: ".$assignmentId."</span><br>
-                  <span>Course Code: ".$courseCode."</span><br>
-                  <span class='fileDetails'> Matric Num: ".$matricnum."</span><br>
-                  <span class='fileName'>Score: ".$obtScore."/".$expScore."</span><br>
 
-                  </div>";
-                echo "</div>";
-                echo "<a class='card-footer text-white clearfix small z-1' href='gradeAssignment.php?Id=".$assignmentId."&matric=".$matricnum."'>";
-                  echo "<span class='float-left'>View Details</span>";
-                  echo "<span class='float-right'>";
-                    echo "<i class='fas fa-angle-right'></i>";
-                  echo "</span>";
-                echo "</a>";
-              echo "</div>";
-            echo "</div>";
-              
+                echo"<tr>";
+                echo "<td>".$sn.".</td>";
+                echo "<td>".$assignmentId."</td>";
+                echo "<td>".$courseCode."</td>";
+                echo "<td>".$matricnum."</td>";
+                echo "<td>".$obtScore."/".$expScore."</td>";
+                echo "<td><a href='gradeAssignment.php?Id=".$assignmentId."&matric=".$matricnum."'>View</a></td>";
+                echo "</tr>";
+                $sn+=1;      
               }
           ?>
+        </tbody></table>
           </div>
-
+ -->
 
         </div>
         <!-- /.container-fluid -->
 
-        <!-- Sticky Footer -->
+      </div>
+      <!-- /.content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+     <!-- Sticky Footer -->
         <footer class="sticky-footer">
           <div class="container my-auto">
             <div class="copyright text-center my-auto">
@@ -283,12 +282,6 @@ $resultTutor = $conn->query($queryTutor);
             </div>
           </div>
         </footer>
-
-      </div>
-      <!-- /.content-wrapper -->
-
-    </div>
-    <!-- /#wrapper -->
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">

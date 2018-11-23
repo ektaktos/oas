@@ -9,10 +9,8 @@ require_once "Admin/connect.php";
     $courses = $row['courses'];
   }
   $course = json_decode($courses);
-
   foreach ($course as $key) {
-     $keyval = str_replace(' ','_',$key);
-     echo "<option value=".str_replace(' ','_',$key).">".$key."</option>";
+     echo "<option value=".$key.">".str_replace('_',' ',$key)."</option>";
   }
 
   return;

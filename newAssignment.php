@@ -11,9 +11,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 	$newend =  date("Y",$enddate);
  
     $tutorId = $_SESSION['oas_tutorId'];
-    // Selecting the courses offered by the current tutor from database
-    $querySelect = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
-    $resultSelect = $conn->query($querySelect);
+    // Selecting the courses offered by tutor.
+    $queryCourses = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
+    $resultCourses = $conn->query($queryCourses);
+    while ($row = $resultCourses->fetch_assoc()) {
+        $courses = $row['courses'];
+    }
+    $course_array = json_decode($courses);
 
     $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
     $resultTutor = $conn->query($queryTutor);
@@ -79,6 +83,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -129,6 +134,14 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
             <span>Article Entry</span>
           </a>
         </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
+          </a>
+        </li>
+
       </ul>
 
     <div id="content-wrapper">
@@ -136,27 +149,76 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     <div class="offset-md-2 col-md-8">
     <h3 align="center" class="display-5">New Assignment</h3>
 
-    <button class="tablink" onclick="openPage('questiontext', this, '#0275d8')" id="defaultOpen">Text Entry</button>
+    <button class="tablink" onclick="openPage('questiontext', this, '#0275d8')" id="defaultOpen">Multiple Questions</button>
     <button class="tablink" onclick="openPage('questionfile', this, '#0275d8')">File Upload</button>
 
     <div id="questiontext" class="tabcontent">
     <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
 
-
-     <div class="formgroup">
-      <textarea class="form-control" name="questiontext" Placeholder="Enter the Assignment Question" rows="5" cols="10"></textarea>
-      </div><br>
-
-
-    <div class="form-group">
-      <input type="text" class="form-control"  name="courseCode" Placeholder="Enter the Course Code"><span id="option1"></span>
+      <div class="form-group">
+      <select class="form-control" name="assignmentId">
+        <option value="">--Select AssignmentId--</option>
+        <option value="Ass01">Assignment 1</option>
+        <option value="Ass02">Assignment 2</option>
+        <option value="Ass03">Assignment 3</option>
+        <option value="Ass04">Assignment 4</option>
+        <option value="Ass05">Assignment 5</option>
+      </select>
     </div>
 
-
     <div class="form-group">
-      <input type="text" class="form-control" name="score" Placeholder="Enter the Assigned Score">
+      <select class="form-control" name="courseCode">
+        <option value="">--Select Course Code--</option>
+        <?php
+         foreach ($course_array as $course) {
+           echo "<option value = ".$course."> ".str_replace('_',' ',$course)."</option>";
+         }
+
+        ?>
+      </select>
     </div>
 
+    <div class="row">
+    <div class="formgroup offset-sm-1 col-sm-8">
+      <textarea class="form-control" name="question[1]" Placeholder="Enter the Assignment Question" rows="2" cols="10"></textarea>
+    </div><br>
+
+
+    <div class="form-group col-sm-2">
+      <input type="text" class="form-control" name="score[1]" Placeholder="Score">
+    </div>
+    </div><br>
+
+    <div class="row">
+    <div class="formgroup offset-sm-1 col-sm-8">
+      <textarea class="form-control" name="question[2]" Placeholder="Enter the Assignment Question" rows="2" cols="10"></textarea>
+    </div>
+
+    <div class="form-group col-sm-2">
+      <input type="text" class="form-control" name="score[2]" Placeholder="Score">
+    </div>
+    </div><br>
+
+    <div class="row">
+    <div class="formgroup offset-sm-1 col-sm-8">
+      <textarea class="form-control" name="question[3]" Placeholder="Enter the Assignment Question" rows="2" cols="10"></textarea>
+    </div><br>
+
+
+    <div class="form-group col-sm-2">
+      <input type="text" class="form-control" name="score[3]" Placeholder="Score">
+    </div>
+    </div><br>
+
+    <div class="row">
+    <div class="formgroup offset-sm-1 col-sm-8">
+      <textarea class="form-control" name="question[4]" Placeholder="Enter the Assignment Question" rows="2" cols="10"></textarea>
+    </div>
+
+    <div class="form-group col-sm-2">
+      <input type="text" class="form-control" name="score[4]" Placeholder="Score">
+    </div>
+    </div><br>
 
     <div class="form-group">
     <label>Submission Date:</label>
@@ -180,9 +242,11 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
   <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data" onsubmit= "return validate(this)">
 
 
-    <!--  <div class="formgroup">
-      <input type="file" name="questionfile">
-     </div> -->
+    <div class="formgroup">
+      <textarea class="form-control" name="questiontext" Placeholder="Enter the Assignment Question" rows="5" cols="10"></textarea>
+      </div><br>
+
+      <h4 align="center">OR</h4>
 
       <div class="formgroup">
       <input type="file" name="questionfile" >
@@ -190,7 +254,26 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 
     <div class="form-group">
-      <input type="text" class="form-control"  name="courseCode" Placeholder="Enter the Course Code"><span id="option1"></span>
+      <select class="form-control" name="courseCode">
+        <option value="">--Select Course Code--</option>
+        <?php
+         foreach ($course_array as $course) {
+           echo "<option value = ".$course."> ".str_replace('_',' ',$course)."</option>";
+         }
+
+        ?>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <select class="form-control" name="assignmentId">
+        <option value="">--Select AssignmentId--</option>
+        <option>Assignment 1</option>
+        <option>Assignment 2</option>
+        <option>Assignment 3</option>
+        <option>Assignment 4</option>
+        <option>Assignment 5</option>
+      </select>
     </div>
 
 
@@ -232,79 +315,108 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 </body> 
 
 <?php
-// GEnerating a 4-digit Assignment ID preceeeding with "Ass"
-$count=0;
-$randnum = 0;
-while($count<4)
-{
-$randDigit = mt_rand(0,9);
-$randnum .= $randDigit;
-$count++;   
-}
-
-$assignmentId= "Ass".$randnum;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 // Testing if the post variables are not empty
-if ((!empty($_POST['questiontext']) || !empty($_FILES["questionfile"]["tmp_name"])) && !empty($_POST['courseCode']) && !empty($_POST['score']) && !empty($_POST['date']) && !empty($_POST['time'])) {
-  echo "Hello";
+if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) || !empty($_POST['questiontext'])) && !empty($_POST['courseCode']) && !empty($_POST['score']) && !empty($_POST['date']) && !empty($_POST['time'])) {
 
-  if (!empty($_POST['questiontext'])) {
-      $question = $_POST['questiontext'];
+  $courseCode = $_POST['courseCode'];
+  $date = $_POST['date'];
+  $time = $_POST['time'];
+  $assignmentId = $_POST['assignmentId'];
+  
+  $assignedDay = date("Y-m-d h:i:sa");
+  $submission = $date . ' ' . $time;
+  $submissiondate = strtotime($submission);
+  // echo "<br>The Assigned date is ", $assignedDay ;
+  // echo "<br>The Deadline for submission is ", $courseCode;
+  // echo "<br>The Question file is " . $tutorId;
+  // echo "<br>";
+
+  if (!empty($_POST['question'])) {
+      $questionArray[] = $_POST['question'];
+      $scoreArray[] = $_POST['score'];
+      $type = 'multiple';
+      // print_r($questionArray[0][1]);
+
+      for ($i=1; $i <= 4; $i++) {
+      $question = $questionArray[0][$i];
+      $score = $scoreArray[0][$i];
+      $assId = $assignmentId.'_'.$i;
+      
+     $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
+      $stmt->bind_param("sssssssss",$assId,$question,$tutorName,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
+      if($stmt->execute()){
+        // echo "Data Inserted Successfully";
+      }
+      else{
+        echo "Data not Successfully Inserted " . $stmt->error;
+      }
+    }
   }
+
   elseif (!empty($_FILES["questionfile"]["tmp_name"])){
       $target_dir = "question_files/";
       $question = $target_dir . basename($_FILES["questionfile"]["name"]);
       move_uploaded_file($_FILES["questionfile"]["tmp_name"], $question);
-  }
-	
-	$courseCode = $_POST['courseCode'];
-	$score = $_POST['score'];
-	$date = $_POST['date'];
-	$time = $_POST['time'];
-	
-	$assignedDay = date("Y-m-d h:i:sa");
-	$submission = $date . ' ' . $time;
-  $submissiondate = strtotime($submission);
-	echo "<br>The Assigned date is ", $assignedDay ;
-	echo "<br>The Deadline for submission is ", $submissiondate;
-  echo "<br>The Question file is " . $question;
-  echo "<br>";
+      $score = $_POST['score'];
+      $type = 'single';
 
-    // Selecting the name of tutor from database
-    $selectTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
-    $result = $conn->query($selectTutor);
-
-    while ($row = $result->fetch_assoc()) {
-       $tutor = $row['Name'];
-    }
-
-  // Ensuring that an assignment id is not inserted twice
-    $selectId = "SELECT* FROM assignmentdetails WHERE assignmentId = '$assignmentId'";
-    $resultId = $conn->query($selectId);
-    $numId = $resultId->num_rows;
-
-    if ($numId >= 1) {
-        // GEnerating another id for the assignment
-        while($count<4)
-        {
-        $randDigit = mt_rand(0,9);
-        $randnum .= $randDigit;
-        $count++;   
-        }
-
-        $assignmentId= "Ass".$randnum;
-    }
-
-    $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$assignedDay,$submission,$score);
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
     if($stmt->execute()){
       echo "Data Inserted Successfully";
     }
     else{
       echo "Data not Successfully Inserted " . $stmt->error;
     }
+
+  }
+
+  elseif (!empty($_POST['questiontext'])) {
+     $question = $_POST['questiontext'];
+     $score = $_POST['score'];
+     $type = 'single';
+      
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
+    if($stmt->execute()){
+      echo "Data Inserted Successfully";
+    }
+    else{
+      echo "Data not Successfully Inserted " . $stmt->error;
+    }
+
+  }
+
+
+
+    // // Selecting the name of tutor from database
+    // $selectTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
+    // $result = $conn->query($selectTutor);
+
+    // $selectId = "SELECT assignmentId FROM assignmentdetails WHERE courseCode = '$courseCode'";
+    // $resultId = $conn->query($selectId);
+    // $row = $resultId->fetch_assoc();
+    // $len = count($row,1);
+    // $numId = $resultId->num_rows;
+
+    // if ($numId >= 1) {
+    //     $assId = $row[$len-1];
+    //     $last = substr($assId, -1);
+    //     $last += 1;
+    //     $assignmentId = substr_replace($assId, $last, -1);
+    // }
+
+    // $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?)");
+    // $stmt->bind_param("ssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$assignedDay,$submission,$score);
+    // if($stmt->execute()){
+    //   echo "Data Inserted Successfully";
+    // }
+    // else{
+    //   echo "Data not Successfully Inserted " . $stmt->error;
+    // }
 
 
 }//End of validating if all the POST variables were sent

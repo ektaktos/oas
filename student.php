@@ -9,7 +9,7 @@ require_once 'Admin/connect.php';
 $matricNum = $_SESSION['oas_studmatricNum'];
 
 // Selecting the courses a student has registered for.
-$queryCourses = "SELECT courses FROM student WHERE matricNum = '$matricNum'";
+$queryCourses = "SELECT courses FROM student WHERE MatricNum = '$matricNum'";
 $resultCourses = $conn->query($queryCourses);
 
 while ($row = $resultCourses->fetch_assoc()) {
@@ -19,6 +19,9 @@ $course_array = json_decode($courses);
 
 $course_string = implode("','", $course_array);
 
+// Mysql Query to select all the available announcements based on tutorid
+$selectAnnouncement = "SELECT* FROM announcement WHERE visible = '1' ORDER BY sn desc LIMIT 0,2";
+$resultAnnouncement = $conn->query($selectAnnouncement); 
 
 $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
@@ -26,7 +29,6 @@ $resultStudent = $conn->query($queryStudent);
  while ($row = $resultStudent->fetch_assoc()) {
         $studentName = $row['Name'];
     }
-
 
  }
 
@@ -93,6 +95,7 @@ $resultStudent = $conn->query($queryStudent);
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -107,6 +110,13 @@ $resultStudent = $conn->query($queryStudent);
           <a class="nav-link" href="registerCourse.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Register Course</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
           </a>
         </li>
 
@@ -133,10 +143,43 @@ $resultStudent = $conn->query($queryStudent);
           <!-- Breadcrumbs-->
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
-              <a href="#">Announcements</a>
+              <a href="announcement.php">Announcements</a>
             </li>
-            <li class="breadcrumb-item active"></li>
-          </ol>
+<!--             <li class="breadcrumb-item active"></li>
+ -->          </ol>
+          <!-- Table to dispaly all current articles -->
+            <table class="table" style="margin-top: 10px;">
+              <thead>
+                <tr>
+                  <th>Sn</th>
+                  <th>Title</th>
+                  <th>Content</th>
+                  <th>Date</th>
+                  <th>Tutor Id</th>
+                  <!-- <th>Action</th> -->
+                </tr>
+              </thead>
+
+              <tbody>
+                <?php
+                  
+                   $sn = 1;
+                    while ($row = $resultAnnouncement->fetch_assoc()) {
+                      
+                      echo"<tr>";
+                      echo "<td>".$sn.".</td>";
+                      echo "<td>".$row['title']."</td>";
+                      echo "<td>".$row['content']."</td>";
+                      echo "<td>".date("M j, Y",strtotime($row['date']))."</td>";
+                      echo "<td>".$row['tutor_id']."</td>";
+                      // echo "<td><a href='#'>View</a></td>";
+                      echo "</tr>";
+                      $sn+=1;
+                    }
+                ?>
+
+              </tbody>
+            </table>
 
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -156,7 +199,7 @@ $resultStudent = $conn->query($queryStudent);
                   while ($row = $resultSelect->fetch_assoc()) {
                       echo "<hr>"; 
                       $assignmentId = $row['assignmentId'];
-                      $courseCode = $row['courseCode'];
+                      $courseCode = str_replace('_',' ',$row['courseCode']);
                       $matricnum = $row['matricNum'];
                       $ass_path = $row['ass_file_path'];
 
@@ -218,7 +261,7 @@ $resultStudent = $conn->query($queryStudent);
                   echo "</div>";
                   echo "<div class='mr-5'>
                   <span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>
-                  <span>Course Code: <b>".$row1['courseCode']."</b></span><br>
+                  <span>Course Code: <b>".str_replace('_',' ',$row1['courseCode'])."</b></span><br>
                   <span>Assignment Id: <b>".$row1['assignmentId']."</b></span><br>
                   <span class='assignmentDetails'> Tutor: <b>".$row1['tutor']."</b></span><br>
                   <span>Date Assigned: <b>".date("M j, Y",strtotime($row1['dateAssigned']))."</b></span><br>
@@ -272,15 +315,22 @@ $resultStudent = $conn->query($queryStudent);
                     $question = $row1['assignmentQuestion'];
                 }
 
+                 if (strpos($assignmentId, '_') !== false) {
+                  $arr = explode('_', $assignmentId);
+                  $assId = $arr[0];
+                   }else{
+                    $assId = $assignmentId;
+                   }
+
                 // Query to slect the score of the selected assignment
-                $queryscore = "SELECT score FROM assignmentresult WHERE assignmentId = '$assignmentId'";
-                $resultscore = $conn->query($queryscore);
+                $queryscore = "SELECT * FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum='$matricnum'";
+                $resultscore = $conn->query($queryscore); 
 
                 while ($row = $resultscore->fetch_assoc()) {
-                    $obtScore = $row['score'];
+                    $obtScore = $row[$assId];
                 }
                             
-              echo "<div class='col-xl-3 col-sm-3 mb-3'>";
+              echo "<div class='col-xl-4 col-sm-4 mb-3'>";
               echo "<div class='card text-white bg-success o-hidden h-100'>";
                 echo "<div class='card-body'>";
                   echo "<div class='card-body-icon'>";
@@ -288,7 +338,7 @@ $resultStudent = $conn->query($queryStudent);
                   echo "</div>";
                   echo "<div class='mr-5'>
                   <span>Ass. Id: ".$assignmentId."</span><br>
-                  <span>Course Code: ".$courseCode."</span><br>
+                  <span>Course Code: ".str_replace('_',' ',$courseCode)."</span><br>
                   <span class='fileDetails'> Matric Num: ".$matricnum."</span><br>
                   <span class='fileName'>Score: ".$obtScore."/".$expScore."</span><br>
 

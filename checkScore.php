@@ -116,6 +116,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>

@@ -40,11 +40,12 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 
 <div class="container div">
 	<!-- FORM CONTROLS-->
-	<form class="form-horizontal" method="post" role="form" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">
+	<form class="form-horizontal" method="POST" role="form" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">
 
     <div class="container">
       <div class="card card-register mx-auto mt-5">
         <div class="card-header">Register an Account</div>
+        <div id="message" style="text-align: center; margin-top: 5px;"></div>
         <div class="card-body">
           <form>
             <div class="form-group">
@@ -101,23 +102,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
                 </div>
               </div>
             </div>
-            <div class="form-group">
-              <div class="form-check">
-                <label class="form-check-label" >Select Courses: &nbsp;</label>
-                <?php
-                if ($resultSelectCourse->num_rows > 0) {
-                  # code...
-                while ($row = $resultSelectCourse->fetch_assoc()) {
-                    echo "<input type='checkbox' name='courses[]' value='".$row['courseCode']."'> ".$row['courseCode']."";
-                }
-                }
-                else{
-                  echo "Sorry No Course Found";
-                }
-
-                ?>
-              </div>
-            </div>
+            
             <button type="submit" name="submit" class="btn btn-primary btn-block">Register</button>
           </form>
           <div class="text-center">
@@ -126,8 +111,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
         </div>
       </div>
     </div>
-		
-      
+  
     </form>
 
 
@@ -148,7 +132,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['matric_num']) && !empty($_POST['phone']) && !empty($_POST['email']) && !empty($_POST['courses']) && !empty($_POST['pword'])) {
+if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['matric_num']) && !empty($_POST['phone']) && !empty($_POST['email'])  && !empty($_POST['pword'])) {
   
   $firstname = fix_string($_POST['firstname']);
   $lastname= fix_string($_POST['lastname']);
@@ -157,9 +141,8 @@ if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['
   $email = fix_string($_POST['email']);
   $pass = fix_string($_POST['pword']);
   $name = $firstname . " " . $lastname;
-  $courses = $_POST['courses'];
+  $semester = '1.1';
 
-  $courses_json = json_encode($courses);
   
   // Hash encryption for protecting password in the database
   $salt1 = "qm&h*";
@@ -167,32 +150,49 @@ if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['
   $passwrd = hash('ripemd128', "$salt1$pass$salt2");
 
   // Checking if the course exists in database already
-  $querySelect = "SELECT* FROM student WHERE matric_num = '$matricNum'";
+  $querySelect = "SELECT* FROM student WHERE MatricNum = '$matricNum'";
   $resultSelect = $conn->query($querySelect);
   $rowNum = $resultSelect->num_rows;
 
   if ($rowNum < 1) {
-    // What to perform if course does not exist in database yet.
     // Code to Insert the details of the new admin to database
-    $stmt = $conn->prepare("INSERT INTO student (Name,MatricNum,courses,phone,email,password) VALUES (?,?,?,?,?,?)");
-    $stmt->bind_param("ssssss",$name,$matricNum,$courses_json,$phone,$email,$passwrd);
+    $stmt = $conn->prepare("INSERT INTO student (Name,MatricNum,phone,email,password,current_semester) VALUES (?,?,?,?,?,?)");
+    $stmt->bind_param("ssssss",$name,$matricNum,$phone,$email,$passwrd,$semester);
 
     if($stmt->execute()){
       echo "Data Inserted Successfully";
+       ?>
+    <script>
+        document.getElementById("message").innerHTML = "Registration Successful";
+        document.getElementById("message").style.color = "green";
+    </script>
+    <?php
       
     }
     else{
       echo "Data not Successfully Inserted" . $stmt->error;
+       ?>
+      <script type="text/javascript">alert('Data Not Inserted');</script>
+      <?php
     }
 
   }//End of what to perform when the course has not been registered yet
 
   else{
     echo "You have been registered already";
+    ?>
+    <script>
+        document.getElementById("message").innerHTML = "You have been Registered already";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
 
   }//End of what to perform when the course is registered already
 
 }//End of validating that the POST variables are not empty
+?>
+      <!-- <script type="text/javascript">alert('Data Fields cannot be empty');</script> -->
+      <?php
 
 }//End of validating that the request method is a POST method
 

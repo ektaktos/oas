@@ -21,6 +21,8 @@
         $studentName = $row['Name'];
     }
 
+    $selectAssignment = "SELECT* FROM assignmentsubmission WHERE assignmentId='$assignmentId' AND matricNum = '$matricNum'";
+	$resultAssignment = $conn->query($selectAssignment); 
 
 ?>
 <!DOCTYPE html>
@@ -32,9 +34,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <title>Submit Assignment - Online Assignment Submission</title>
-<!-- Bootstrap core CSS -->
-<link href="admin/css/bootstrap.min.css" rel="stylesheet">
-<link href="admin/css/dashboard.css" rel="stylesheet">
+<!-- Bootstrap core CSS-->
+    <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+     <!-- Custom styles for this template-->
+    <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
+
 
 <body>
 
@@ -80,14 +87,17 @@
 			$tutor = $row['tutor'];
 			$tutorId = $row['tutorId'];
 			$courseCode = $row['courseCode'];
+			$type = $row['type'];
 			$submDate = $row['submissionDate'];
 			$dateAssigned = date("M j, Y",strtotime($row['dateAssigned']));
 			$deadlineDate = date("M j, Y",strtotime($row['submissionDate']));
 			$deadlineTime = date("h:ia",strtotime($row['submissionDate']));
 			$assignedScore = $row['score'];
+			if(!empty($row['file_path'])){
 			$filePath = $row['file_path'];
 			$arr = explode('/', $filePath);
 	        $ass_file = $arr[1];
+	        }
 		}
 			
 		// Getting the details of the tutor from database too
@@ -100,7 +110,7 @@
 		}
 		echo "<table class='table table-bordered'>";
 		echo "<tr><td><strong>Assignment Question:</strong></td><td> ". $question."</td></tr>";
-		if ($filePath == "") {
+		if (isset($filePath) == "") {
 			
 		}
 		else{
@@ -110,7 +120,7 @@
 		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
 		echo "<tr><td><strong>Tutor Email:</strong></td><td> " . $tutorEmail ."</td></tr>";
 		echo "<tr><td><strong>Tutor Phone:</strong></td><td> " . $tutorPhone ."</td></tr>";
-		echo "<tr><td><strong>Course Code:</strong></td><td> " . $courseCode ."</td></tr>";
+		echo "<tr><td><strong>Course Code:</strong></td><td> " . str_replace('_',' ',$courseCode)."</td></tr>";
 		echo "<tr><td><strong>Date Assigned:</strong></td><td> " . $dateAssigned ."</td></tr>";
 		echo "<tr><td><strong>Submission Date:</strong></td><td> " . $deadlineDate ."</td></tr>";
 		echo "<tr><td><strong>Submission Time:</strong></td><td> " . $deadlineTime ."</td></tr>";
@@ -125,15 +135,26 @@
 		if ($datetime2 > $datetime1) {
 			echo "<b>Sorry, Assignment cannot be Submitted. Submission Deadline has been reached.</b>";
 		}
+		elseif ($resultAssignment->num_rows > 0) {
+			echo "<b>Assignment has been Submitted Already.</b>";
+		}
 		else{
+			if ($type == 'single') {
 		?>
 		<!-- Form To upload the txt document-->
 		<form method="post" role="form" class="form-horizontal" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 			<input type="file" name="myfile">
 			<input type="submit" name="submit" value="Upload" class="btn btn-primary">
 		</form>
-
 		<?php
+		}elseif ($type == 'multiple') {
+		?>
+		<form method="post" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+		 <textarea class="form-control" name="answer" Placeholder="Enter the Answer Here" rows="5" cols="10"></textarea>
+		 <input type="submit" name="submit" value="Submit" class="btn btn-primary">
+		</form>
+		<?php
+		}
 		}
 
 	}
@@ -145,6 +166,20 @@
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	if (!empty($_POST['submit'])) {
+
+		if (isset($_POST['answer'])) {
+		    	$answer = $_POST['answer'];
+		    	$stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,courseCode,matricNum,ass_answer,status,date) VALUES (?,?,?,?,?,?)");
+			    $stmt->bind_param("ssssss",$assignmentId,$courseCode,$matricNum,$answer,$status,$date);
+
+			    if($stmt->execute()){
+			      echo "Data Inserted Successfully";
+			    }
+			    else{
+			      echo "Data not Successfully Inserted " . $stmt->error;
+			    }
+		}
+		elseif(!empty($_FILES["myfile"]["tmp_name"])){
 
 		$target_dir = "sub_ass_files/";
 		$target_file = $target_dir . basename($_FILES["myfile"]["name"]);
@@ -176,9 +211,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		    if (move_uploaded_file($_FILES["myfile"]["tmp_name"], $target_file)){
 
-		        // echo "File Successfully uploaded.";
-
-		        // Saving the assignment in database
 		        $stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,courseCode,matricNum,ass_file_path,status,date) VALUES (?,?,?,?,?,?)");
 			    $stmt->bind_param("ssssss",$assignmentId,$courseCode,$matricNum,$target_file,$status,$date);
 
@@ -193,6 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		        echo "Sorry, there was an error uploading your file.";
 		    }
 		}
+	}
 		
 	}
 	else{
@@ -202,20 +235,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 
-
-// }
-// else{
-// 	echo "Sorry this page is inaccessible";
-// }
-
-
 ?>
 </div>
 
 <div class="container-fluid col-sm-12">
     <footer class="footer">
          <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
+       <p align="center">&copy; <?php echo Date("Y");?> OAS System </p>
       </footer>
 </div>
 

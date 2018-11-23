@@ -9,6 +9,10 @@ if (!empty($_SESSION['oas_tutorId'])) {
 $tutorId = $_SESSION['oas_tutorId'];
 $link = "tutor.php";
 
+// Mysql Query to select all the available announcements based on tutorid
+$selectAnnouncement = "SELECT* FROM announcement WHERE tutor_id = '$tutorId' AND visible='1'";
+$resultAnnouncement = $conn->query($selectAnnouncement); 
+
   $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
   $resultTutor = $conn->query($queryTutor);
 
@@ -19,6 +23,10 @@ $link = "tutor.php";
  elseif (!empty($_SESSION['oas_studmatricNum'])) {
   $matricNum = $_SESSION['oas_studmatricNum'];
   $link = "student.php";
+
+// Mysql Query to select all the available announcements based on tutorid
+$selectAnnouncement = "SELECT* FROM announcement";
+$resultAnnouncement = $conn->query($selectAnnouncement); 
 
   $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
   $resultStudent = $conn->query($queryStudent);
@@ -45,13 +53,16 @@ $link = "tutor.php";
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Article Entry - OAS</title>
+    <title>Announcement - OAS</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom fonts for this template-->
     <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Page level plugin CSS-->
+    <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
@@ -61,11 +72,13 @@ $link = "tutor.php";
   <body id="page-top">
 
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-   
-      <a class="nav-brand mr-1" href="<?php echo $link; ?>" style="color: #ffffff;">
-        <i class="fas fa-fw fa-tachometer-alt"></i>
-        <span >Dashboard</span>
-      </a>
+
+<!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
+
+          <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span >Dashboard</span>
+          </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
@@ -98,7 +111,7 @@ $link = "tutor.php";
 
     <div id="wrapper">
 
-      <!-- Sidebar -->
+       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
       <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
         <li class="nav-item">
@@ -136,14 +149,14 @@ $link = "tutor.php";
           </a>
         </li>
 
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="articleEntry.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Article Entry</span>
           </a>
         </li>
 
-         <li class="nav-item">
+         <li class="nav-item active">
           <a class="nav-link" href="announcement.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Announcement</span>
@@ -183,61 +196,58 @@ $link = "tutor.php";
 
       </ul>
 
+
       <div id="content-wrapper">
-        <div class="container-fluid">
-            <h3>Article Entry</h3>
-        <!-- Ensuring only the tutor has access to upload article -->
-        <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
-          <div style="background-color: #343a40; padding: 10px 0px 0px 5px; border: 2px solid silver; border-radius: 5px; color: #FFF;" class="col-sm-10">
-          <form method="post" class="form-inline" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data">
-                       
-              <div class="form-group" style="margin: 10px 5px 10px 15px;">
-                <label>Article Name:&nbsp; </label> 
-                <input type="text" name="articleName" placeholder="Enter Article name" class="form-control">
-              </div>
 
-              <div class="form-group" style="margin: 10px 5px 10px 15px;">
-                <label>Article File:&nbsp; </label> 
-                <input type="file" name="articleFile" class="form-control">
-              </div>
-
-              <div style="margin: 10px 5px 10px 15px;">
-              <input type="submit" value="Submit" name="submit" class="btn btn-primary">
-              </div>            
-            </form>
-            </div>
-          <?php } ?>
-            <!-- Table to dispaly all current articles -->
+        <div class="container">
+          <h4 style="margin: 10px 0px 20px 0px; text-align: center;">Announcements</h4>
+          <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
+          <div class="col-sm-7" style="border:2px solid #dddddd;">
+          <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" placeholder="Enter Announcement Title" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Announcement Content</label>
+            <textarea class="form-control" name="content"></textarea>
+          </div>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary">
+          </div>
+         </form>
+         </div>
+       <?php }?>
+         <!-- Table to dispaly all current articles -->
             <table class="table table-responsive" style="margin-top: 40px;">
               <thead>
                 <tr>
                   <th>Sn</th>
-                  <th>Article Name</th>
-                  <th>Author</th>
-                  <th>Date Uploaded</th>
-                  <?php
-                  if (!empty($_SESSION['oas_tutorId'])) {
-                  echo "<th>Action</th>";
-                  }
-                  ?>
+                  <th>Title</th>
+                  <th>Content</th>
+                  <th>Date</th>
+                  <th>Tutor Id</th>
+                  <?php if(isset($tutorId)){?>
+                  <th>Action</th>
+                  <?php } ?>
                 </tr>
               </thead>
 
               <tbody>
                 <?php
-                   $query = "SELECT* FROM article WHERE visible='1'";
-                   $result = $conn->query($query);
+                  
                    $sn = 1;
-                    while ($row = $result->fetch_assoc()) {
+                    while ($row = $resultAnnouncement->fetch_assoc()) {
                       
                       echo"<tr>";
                       echo "<td>".$sn.".</td>";
-                      echo "<td><a href='".$row['articlePath']."'>".$row['articleName']."</a></td>";
-                      echo "<td>".$row['tutorName']."</td>";
-                      echo "<td>".date("M j, Y",strtotime($row['uploadedDate']))."</td>";
-                      if (!empty($_SESSION['oas_tutorId'])) {
-                      echo "<td><button onclick='deletearticle(".$row['sn'].")'>Delete</button></td>";
-                       }
+                      echo "<td>".$row['title']."</td>";
+                      echo "<td>".$row['content']."</td>";
+                      echo "<td>".date("M j, Y",strtotime($row['date']))."</td>";
+                      echo "<td>".$row['tutor_id']."</td>";
+                      if(isset($tutorId)){
+                      echo "<td><a href='#' onclick='deletesn(".$row['sn'].")'>Delete</a></td>";
+                      } 
                       echo "</tr>";
                       $sn+=1;
                     }
@@ -245,19 +255,22 @@ $link = "tutor.php";
 
               </tbody>
             </table>
-
-
+  
 
         </div>
-      </div>
         <!-- /.container-fluid -->
+
+        
 
       </div>
       <!-- /.content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
 <!-- Sticky Footer -->
-        <footer class="sticky-footer container-fluid">
+        <footer class="sticky-footer">
           <div class="container my-auto">
-            <div class="copyright my-auto">
+            <div class="copyright text-center my-auto">
               <span>Copyright © Your Website 2018</span>
             </div>
           </div>
@@ -293,22 +306,16 @@ $link = "tutor.php";
     <!-- Core plugin JavaScript-->
     <script src="Admin/dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Custom scripts for all pages-->
-    <script src="Admin/dashboard/js/sb-admin.min.js"></script>
-
-
   </body>
-
 </html>
 <script>
-
-  function deletearticle(id){
+  function deletesn(id){
      $.ajax({
             type:"post",
             url: "delete.php",
-            data:{id:id ,db : 'article'},
-            success: function() { 
-                alert('Article deleted Successfully');
+            data:{id:id ,db : 'announcement'},
+            success: function(res) { 
+                alert(res);
                 setTimeout(() => {
                     location.reload();
                 }, 500);
@@ -320,40 +327,38 @@ $link = "tutor.php";
 </script>
 
 <?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-// Confirming that post data was sent from the same page
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Confirming that submitted variables are not empty
-    if (!empty($_POST['articleName']) && !empty($_FILES['articleFile']['tmp_name'])) {
+if (!empty($_POST['title']) && !empty($_POST['content'])) {
+  
+  $title = fix_string($_POST['title']);
+  $content = fix_string($_POST['content']);
+  $date = date("Y-m-d h:i:sa");
 
-      $name = $_POST['articleName'];
-      $uploadedDate = date("Y-m-d h:i:sa");
-      $target_dir = "articles/";
-      $target_file = $target_dir . basename($_FILES["articleFile"]["name"]);
+  $stmt = $conn->prepare("INSERT INTO announcement (title,content,tutor_id,date,visible) VALUES (?,?,?,?,?)");
+  $stmt->bind_param("sssss",$title,$content,$tutorId,$date,'1');
 
-      // Checking if the article exists in record already
-      $selectArticle = "SELECT* FROM article WHERE articleName='$name' AND articlePath='$target_file'";
-      $resultArticle = $conn->query($selectArticle);
-      $num = $resultArticle->num_rows;
-      if ($num >=1 ) {
-        echo "Sorry Article Exists already";
-        return;
-      }
-      
-      move_uploaded_file($_FILES["articleFile"]["tmp_name"], $target_file);
-      // Inserting the new article to database
-      $stmt = $conn->prepare("INSERT INTO article(articleName,articlePath,tutorName,uploadedDate,visible) value (?,?,?,?,?)");
-      $stmt->bind_param('sssss',$name,$target_file,$tutorName,$uploadedDate,'1');
-      if($stmt->execute()){
-      echo "Data Inserted Successfully";
-      }
-      else{
-      echo "Data not Successfully Inserted " . $stmt->error;
-      }
-    }
-    else{
-          echo "Sorry, Fill all fields";
-    } 
+  if($stmt->execute()){
+     echo "Data Inserted Successfully";
+     ?><script>window.location.href = 'announcement.php'</script><?php
+  }
+  else{
+      echo "Data not Successfully Inserted" . $stmt->error;
+  }
+
+}//End of validating that the POST variables are not empty
+
+}//End of validating that the request method is a POST method
+
+
+
+function fix_string($string)
+{
+if (get_magic_quotes_gpc()) $string = stripslashes($string);
+return htmlentities ($string);
 }
+
+
+
 
 ?>

@@ -24,6 +24,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     while ($row = $resultTutor->fetch_assoc()) {
         $tutorName = $row['Name'];
     }
+    
  }
 
  else{
@@ -85,6 +86,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -94,7 +96,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
         
-        <li class="nav-item">
+        <li class="nav-item active">
             <a href="scoresheet.php" class="nav-link">
               <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Scoresheet</span>
@@ -129,10 +131,17 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           </a>
         </li>
 
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="articleEntry.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Article Entry</span>
+          </a>
+        </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
           </a>
         </li>
       </ul>
@@ -145,8 +154,12 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
                     <th>Name</th>
                     <th>Matric. No</th>
                     <th>Course Code</th>
-                    <th>Assignment ID</th>
-                    <th>Score</th>
+                    <th>Ass. 1</th>
+                    <th>Ass. 2</th>
+                    <th>Ass. 3</th>
+                    <th>Ass. 4</th>
+                    <th>Ass. 5</th>
+                    <th>Average</th>
                   </tr>
                 
             <?php
@@ -168,9 +181,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
                 echo '<td>'.$i.'</td>';
                 echo "<td>". $studentName."</td>";
                 echo "<td>". $matricNum."</td>";
-                echo "<td>". $row['courseCode']."</td>";
-                echo "<td>". $row['assignmentId']."</td>";
-                echo "<td>".$row['score']."</td>";
+                echo "<td>".str_replace('_',' ',$row['courseCode'])."</td>";
+                echo "<td>". $row['Ass01']."</td>";
+                echo "<td>". $row['Ass02']."</td>";
+                echo "<td>". $row['Ass03']."</td>";
+                echo "<td>". $row['Ass04']."</td>";
+                echo "<td>". $row['Ass05']."</td>";
+                // echo "<td>". $row['Ass02']."</td>";
                 echo "</tr>";
 
               $i++;

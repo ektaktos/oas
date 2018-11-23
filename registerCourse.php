@@ -19,6 +19,10 @@ $course_array = json_decode($courses);
 
 $course_string = implode("','", $course_array);
 
+// Selecting all the available courses from database
+$querySelectCourse = "SELECT courseCode FROM course";  
+$resultSelectCourse = $conn->query($querySelectCourse);
+
 
 $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
@@ -57,8 +61,6 @@ $resultStudent = $conn->query($queryStudent);
     <!-- Custom fonts for this template-->
     <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Page level plugin CSS-->
-    <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
@@ -94,6 +96,7 @@ $resultStudent = $conn->query($queryStudent);
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -109,6 +112,13 @@ $resultStudent = $conn->query($queryStudent);
           <a class="nav-link" href="registerCourse.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Register Course</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
           </a>
         </li>
 
@@ -132,8 +142,36 @@ $resultStudent = $conn->query($queryStudent);
 
         <div class="container-fluid">
 
+          <h2 align="center">Current Level (100 Level)</h2>
+          <div>
+            <select class="form-group" id="semester">
+              <option value=""> Choose Semester</option>
+              <option value="1.1">100 First</option>
+              <option value="1.2">100 Second</option>
+              <option value="2.1">200 First</option>
+              <option value="2.2">200 Second</option>
+              <option value="3.1">300 First</option>
+              <option value="3.2">300 Second</option>
+              <option value="4.1">400 First</option>
+              <option value="4.2">400 Second</option>
+            </select>
+          </div>
           
 
+         <form class="form-horizontal" method="post" role="form" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">
+          <table class="table table-responsive" id="Semestercourses" align="center">
+            <th>
+              <td>COURSE CODE</td>
+              <td>COURSE NAME</td>
+              <td>UNIT</td>
+              <td>CHOICE</td>
+            </th>
+              
+          </table>
+          <div class="col-sm-10" align="center">
+                  <input type="Submit" name="submit" value="Submit" class="btn btn-primary">
+              </div> 
+          </form>       
           
 
         </div>
@@ -182,34 +220,59 @@ $resultStudent = $conn->query($queryStudent);
     <script src="Admin/dashboard/vendor/jquery/jquery.min.js"></script>
     <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="Admin/dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
+  </body>
 
-    <!-- Page level plugin JavaScript-->
-    <script src="Admin/dashboard/vendor/chart.js/Chart.min.js"></script>
-    <script src="Admin/dashboard/vendor/datatables/jquery.dataTables.js"></script>
-    <script src="Admin/dashboard/vendor/datatables/dataTables.bootstrap4.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="Admin/dashboard/js/sb-admin.min.js"></script>
-
-    <!-- Demo scripts for this page-->
-    <script src="Admin/dashboard/js/demo/datatables-demo.js"></script>
-    <script src="Admin/dashboard/js/demo/chart-area-demo.js"></script>
-
-    <!-- Script to display assignments -->
+  <!-- Script to display assignments -->
     <script type="text/javascript">
       $(document).ready(function() {
-      $('.ass_btn').unbind('click');
-      $('.ass_btn').click(function() {
-      var status = $(this).attr('value');
-      var matricNum = $("input[type='hidden']").val();
-      $("#ass_div").load('getCourses.php',{"status":status,"matricNum":matricNum})
+      $('#semester').change(function() {
+      var semester = $("#semester").val();
+      $("#Semestercourses").load('getSemesterCourse.php',{"semester":semester})
       });
       return false;
        });
     </script>
 
-  </body>
-
 </html>
+
+<?php
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+if (!empty($_POST['courses'])) {
+  $course = $_POST['courses'];
+  $courses_json = json_encode($course);
+
+  // Checking if the course exists in database already
+  $querySelect = "SELECT courses FROM student WHERE MatricNum = '$matricNum'";
+  $resultSelect = $conn->query($querySelect);
+  $rowNum = $resultSelect->num_rows;
+
+    // What to perform if course does not exist in database yet.
+    // Code to Insert the details of the new admin to database
+    $updateQuery = "UPDATE student SET courses AS $courses_json WHERE MatricNum = '$matricNum'";
+    $resultUpdate = query($updateQuery);
+
+    if($stmt->execute()){
+      echo "Data Inserted Successfully";
+      
+    }
+    else{
+      echo "Data not Successfully Inserted" . $stmt->error;
+    }
+
+
+}//End of validating that the POST variables are not empty
+
+}//End of validating that the request method is a POST method
+
+
+
+function fix_string($string)
+{
+if (get_magic_quotes_gpc()) $string = stripslashes($string);
+return htmlentities ($string);
+}
+
+
+?>

@@ -90,6 +90,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="profile.php">Profile</a>
           </div>
         </li>
       </ul>
@@ -138,6 +139,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           <a class="nav-link" href="articleEntry.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Article Entry</span>
+          </a>
+        </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="announcement.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Announcement</span>
           </a>
         </li>
       </ul>
@@ -200,7 +208,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           echo '<td>'.$i.'</td>';
           echo "<td>". $studentName."</td>";
           echo "<td>". $matricNum."</td>";
-          echo "<td>". $row['courseCode']."</td>";
+          echo "<td>". str_replace('_',' ',$row['courseCode'])."</td>";
           echo "<td>". $row['assignmentId']."</td>";
           echo "<td>".$row['score']."</td>";
           echo "</tr>";
