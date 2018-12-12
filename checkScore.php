@@ -4,10 +4,10 @@ session_start();
 require_once "Admin/connect.php";
 
 // Saving the assignment id in a session variable and allowing a new id to override
-	if (!empty($_GET['Id']) && !empty($_GET['matric'])){
-		$assignmentId = $_GET['Id'];
+	if (!empty($_GET['Id']) && !empty($_GET['matric']) && !empty($_GET['course'])){
+		$courseCode = str_replace(' ', '_', $_GET['course']);
+    $assignmentId = $_GET['Id'];
 		$matricNum = $_GET['matric'];
-		$_SESSION['assID'] = $assignmentId;
 		$_SESSION['matric'] = $matricNum;
 	}
 	else{
@@ -15,16 +15,19 @@ require_once "Admin/connect.php";
 		$matricNum = $_SESSION['matric'];
 	}
 
+  if (strpos($assignmentId, '_') !== false) {
+    $arr = explode('_', $assignmentId);
+    $assId = $arr[0];
+  }else{
+    $assId = $assignmentId;
+  }
+
 
 if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) {
- 	 
-    $tutorId = $_SESSION['oas_tutorId'];
     
 
    $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
 	$resultStudent = $conn->query($queryStudent);
-
- 
 
 	$queryAssDetails = "SELECT assignmentQuestion,score FROM assignmentdetails WHERE assignmentId='$assignmentId'";
 	$resultAssDetails = $conn->query($queryAssDetails);
@@ -34,7 +37,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 	$resultAssignment = $conn->query($selectAssignment); 
 
 	// Checking if the assignment has been graded for the student already 
-	$queryResult = "SELECT* FROM assignmentresult WHERE assignmentId = '$assignmentId' AND matricNum = '$matricNum'";
+	$queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
 	$resultResult = $conn->query($queryResult);
 
     while ($row = $resultStudent->fetch_assoc()) {
@@ -43,20 +46,26 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 
     while ($row = $resultAssDetails->fetch_assoc()) {
     	$question = $row['assignmentQuestion'];
-    	$exp_score = $row['score'];
+    	$exp_score[] = $row['score'];
     }
+    $exp_score = array_sum($exp_score);
     
 	while ($row = $resultAssignment->fetch_assoc()) {
         $courseCode = $row['courseCode'];
-        $ass_path = $row['ass_file_path'];
+        if (!empty($row['ass_file_path'])) {
+          $filePath = $row['ass_file_path'];
+          $arr = explode('/', $filePath);
+          $ass_file = $arr[1];
+          $answer = "<a href='".$filePath."' target='_blank'>".$ass_file."</a>";
+        }
+        elseif (!empty($row['ass_answer'])) {
+          $answer = $row['ass_answer'];
+        }
 
-        $arr = explode('/', $ass_path);
-        $ass_file = $arr[1];
-        $newpath = "graded_ass_files/".$ass_file;
      }
 
      while ($row = $resultResult->fetch_assoc()) {
-     	$graded_score = $row['score'];
+       $graded_score = $row[$assId];
      }
 
  }
@@ -94,7 +103,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-      <a class="navbar-brand mr-1" href="index.html">Start Bootstrap</a>
+      <a class="navbar-brand mr-1" href="index.html">OAS</a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
@@ -135,11 +144,12 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
  <div class="container">
 
 <div class="offset-md-2 col-md-8">
-<p><strong>Course Name/Code:</strong> <?php echo $courseCode;  ?></p>
+<p><strong>Course Name/Code:</strong> <?php echo str_replace('_',' ',$courseCode);  ?></p>
+<p><strong>Assignment Id:</strong> <?php echo $assignmentId;  ?></p>
 <p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
 <p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
 
-<P><strong>Assignment File:</strong> <a target="_blank" href="<?php echo $ass_path; ?>"><?php echo $ass_file; ?></a></P>
+<P><strong>Assignment File:</strong> <?=$answer?> </P>
 
 <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
 

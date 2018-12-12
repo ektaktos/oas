@@ -152,7 +152,7 @@ $resultStudent = $conn->query($queryStudent);
                     $filePath = $row['ass_file_path'];
                      $arr = explode('/', $filePath);
                      $ass_file = $arr[1];
-                     $answer = "<a href='".$filePath."'>".$ass_file."</a>";
+                     $answer = "<a href='".$filePath."' target='_blank'>".$ass_file."</a>";
                   }
                   elseif (!empty($row['ass_answer'])) {
                     $answer = $row['ass_answer'];

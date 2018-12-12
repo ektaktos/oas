@@ -21,7 +21,7 @@
         $studentName = $row['Name'];
     }
 
-    $selectAssignment = "SELECT* FROM assignmentsubmission WHERE assignmentId='$assignmentId' AND matricNum = '$matricNum'";
+    $selectAssignment = "SELECT* FROM assignmentsubmission WHERE assignmentId='$assignmentId'";
 	$resultAssignment = $conn->query($selectAssignment); 
 
 ?>
@@ -48,7 +48,7 @@
 <div class="jumbotron">
       <div class="container" align="center">
       <h1 align="center">Online Assignment Submission</h1>
-      <p align="center">Upload Assignment File</p>
+      <p align="center">Submit Group Assignment</p>
       </div>
  </div><!-- End of Main Jumbotron-->
 
@@ -73,12 +73,11 @@
 
 
 	// Getting all the details of the assignment from database
-	$selectDetails = "SELECT* FROM assignmentdetails WHERE assignmentId = '$assignmentId'";
+	$selectDetails = "SELECT* FROM assignmentdetails WHERE assignmentId = '$assignmentId' AND format='group'";
 	$resultDetails = $conn->query($selectDetails);
 	$rownum = $resultDetails->num_rows;
 
-	// Getting the details of the tutor from database too
-
+	// Getting the details of the Assignment from database
 	if ($rownum > 0 ) {
 		# What to perform when the assignment Id is present in database
 		while ($row = $resultDetails->fetch_assoc()) {
@@ -104,11 +103,14 @@
 		$selectTutor = "SELECT* FROM tutor WHERE StaffId = '$tutorId'";
 		$resultTutor = $conn->query($selectTutor);
 
+		// Query to get the List of group names
+		$selectGroups = "SELECT group_name FROM group_members WHERE courseCode = '$courseCode'";
+		$resultGroups = $conn->query($selectGroups);
+
 		while ($row = $resultTutor->fetch_assoc()) {
 			$tutorEmail = $row['email'];
 			$tutorPhone = $row['phone'];
 		}
-		if ($type == 'single') {
 		echo "<table class='table table-bordered'>";
 		echo "<tr><td><strong>Assignment Question:</strong></td><td> ". $question."</td></tr>";
 		if (isset($filePath) == "") {
@@ -142,69 +144,19 @@
 		<!-- Form To upload the txt document-->
 		<form method="post" role="form" class="form-horizontal" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 			<input type="file" name="myfile">
+			<select name="group_name">
+			<option value=''>--Select Group Name--</option>
+			<?php
+			while ($row = $resultGroups->fetch_assoc()) {
+				echo "<option value=".$row['group_name'].">".$row['group_name']."</option>";
+			}
+			?>
+			</select>
 			<input type="hidden" name="subAssId" value="">
 			<input type="submit" name="submit" value="Upload" class="btn btn-primary">
 		</form>
 		<?php
 		}
-
-		}elseif($type == 'multiple'){
-		echo "<table class='table table-bordered'>";
-		echo "<tr><td><strong>Assignment Id:</strong></td><td> " . $assignmentId ."</td></tr>";
-		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
-		echo "<tr><td><strong>Tutor Email:</strong></td><td> " . $tutorEmail ."</td></tr>";
-		echo "<tr><td><strong>Tutor Phone:</strong></td><td> " . $tutorPhone ."</td></tr>";
-		echo "<tr><td><strong>Course Code:</strong></td><td> " . str_replace('_',' ',$courseCode)."</td></tr>";
-		echo "<tr><td><strong>Date Assigned:</strong></td><td> " . $dateAssigned ."</td></tr>";
-		echo "<tr><td><strong>Submission Date:</strong></td><td> " . $deadlineDate ."</td></tr>";
-		echo "<tr><td><strong>Submission Time:</strong></td><td> " . $deadlineTime ."</td></tr>";
-		echo "</table>";
-		$status = "UnGraded";
-		// Checking if the submission deadline has not passed
-		$datetime1 = new DateTime($submDate);
-		$datetime2 = new DateTime(date("Y-m-d h:i:sa"));
-
-		if ($datetime2 > $datetime1) {
-			echo "<b>Sorry, Assignment cannot be Submitted. Submission Deadline has been reached.</b>";
-		}
-		elseif ($resultAssignment->num_rows > 4) {
-			echo "<b>Assignment has been Submitted Already.</b>";
-		}
-		else{
-			// Getting assignments that have been submitted from database
-            $querySelect1 = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND courseCode='$courseCode'";
-            $resultSelect1 = $conn->query($querySelect1);
-            if ($resultSelect1->num_rows > 0) {
-            	while ($row2 = $resultSelect1->fetch_assoc()) {
-		        $assIdArray[] = $row2['sub_AssId'];
-		        }
-		        $assignments_string = implode("','", $assIdArray);
-            }else{
-            	$assignments_string = '';
-            }
-
-            $selectQuestion = "SELECT* FROM assignmentdetails WHERE assignmentId = '$assignmentId' AND sub_AssId NOT IN ('$assignments_string')";
-            $resultQuestion = $conn->query($selectQuestion);
-            $rownum = $resultQuestion->num_rows;  $i = 0; $j=1;
-            while ($row1 = $resultQuestion->fetch_assoc()) {
-            	?>
-			<form method="post" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-			<div class="row">
-			 <div class="col-sm-4"><b>Question <?=$j?>:</b> <?=$row1['assignmentQuestion']?></div>
-			 <div class="col-sm-4">
-			 <textarea class="form-control" name="answer" Placeholder="Enter the Answer Here" rows="5" cols="10"></textarea>
-			 </div>
-			 <input type="hidden" name="subAssId" value="<?=$row1['sub_AssId']?>">
-			 <div class="col-sm-2">
-			 	<input type="submit" name="submit" value="Submit" class="btn btn-primary">
-			 </div>
-			 <div class="col-sm-2"><b>Assigned Score:</b> <?=$row1['score']?></div>
-			 </div>
-			</form>
-			<?php $j+=1;}
-		}
-		}
-		
 	}
 	else{
 		echo "Sorry, Assignment Does not Exist";
@@ -214,24 +166,10 @@
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	if (!empty($_POST['submit'])) {
+		if(!empty($_FILES["myfile"]["tmp_name"])){
 
-		if (isset($_POST['answer'])) {
-		    	$answer = $_POST['answer'];
-		    	$assId = $_POST['subAssId']; 
-		    	// echo $assId;
-		    	$stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,sub_AssId,courseCode,matricNum,ass_answer,status,date) VALUES (?,?,?,?,?,?,?)");
-			    $stmt->bind_param("sssssss",$assignmentId,$assId,$courseCode,$matricNum,$answer,$status,$date);
-
-			    if($stmt->execute()){
-			      echo "Data Inserted Successfully";
-			      header("Location:upload.php?Id=".$_GET['Id']."");
-			    }
-			    else{
-			      echo "Data not Successfully Inserted " . $stmt->error;
-			    }
-		}
-		elseif(!empty($_FILES["myfile"]["tmp_name"])){
-
+		$group_name = $_POST['group_name'];
+		$format = 'group';
 		$target_dir = "sub_ass_files/";
 		$target_file = $target_dir . basename($_FILES["myfile"]["name"]);
 
@@ -262,8 +200,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		    if (move_uploaded_file($_FILES["myfile"]["tmp_name"], $target_file)){
 
-		        $stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,courseCode,matricNum,ass_file_path,status,date) VALUES (?,?,?,?,?,?)");
-			    $stmt->bind_param("ssssss",$assignmentId,$courseCode,$matricNum,$target_file,$status,$date);
+		        $stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,courseCode,matricNum,format,ass_file_path,status,date) VALUES (?,?,?,?,?,?,?)");
+			    $stmt->bind_param("sssssss",$assignmentId,$courseCode,$group_name,$format,$target_file,$status,$date);
 
 			    if($stmt->execute()){
 			      echo "Data Inserted Successfully";

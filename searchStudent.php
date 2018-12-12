@@ -122,6 +122,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         </li>
 
         <li class="nav-item">
+          <a class="nav-link" href="creategroup.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Create Group</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
           <a class="nav-link" href="newAssignment.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>New Assignment</span>
@@ -129,7 +136,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="newAssignment.php">
+          <a class="nav-link" href="groupAssignment.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>New Group Assignment</span>
           </a>

@@ -4,27 +4,27 @@ session_start();
 require_once "Admin/connect.php";
 if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
  	# What to perform if the tutor is really logged in
-  $startdate = strtotime("today");
+  	$startdate = strtotime("today");
 	$enddate = strtotime("+1 year",$startdate);
 
 	$newstart =  date("Y", $startdate);
 	$newend =  date("Y",$enddate);
  
     $tutorId = $_SESSION['oas_tutorId'];
-    // Selecting the courses offered by the current tutor from database
-    $querySelect = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
-    $resultSelect = $conn->query($querySelect);
+    // Selecting the courses offered by tutor.
+    $queryCourses = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
+    $resultCourses = $conn->query($queryCourses);
+    while ($row = $resultCourses->fetch_assoc()) {
+        $courses = $row['courses'];
+    }
+    $course_array = json_decode($courses);
 
     $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
     $resultTutor = $conn->query($queryTutor);
 
-    $queryScoresheet = "SELECT* FROM assignmentresult";
-    $resultScoresheet = $conn->query($queryScoresheet);
-
     while ($row = $resultTutor->fetch_assoc()) {
         $tutorName = $row['Name'];
     }
-    
  }
 
  else{
@@ -44,22 +44,19 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>Scoresheet-Online Assignment Submission</title>
+<title>New Assignment-Online Assignment Submission</title>
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom fonts for this template-->
     <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
 
-   <!-- Custom styles for this template-->
+    <!-- Custom styles for this template-->
     <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
-
 <body>
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+ <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-<!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
-
-          <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
+         <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span >Dashboard</span>
           </a>
@@ -96,7 +93,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
         
-        <li class="nav-item active">
+        <li class="nav-item">
             <a href="scoresheet.php" class="nav-link">
               <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Scoresheet</span>
@@ -131,8 +128,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           </a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link" href="groupAssignment.php">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>New Group Assignment</span>
           </a>
@@ -151,60 +148,73 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
             <span>Announcement</span>
           </a>
         </li>
+
       </ul>
 
-      <div id="content-wrapper">
-      <div class="container-fluid" align="center">
-          <table width="auto" class="table table-hover table-responsive" align="center">
-                  <tr>
-                    <th>Sn.</th>
-                    <th>Name</th>
-                    <th>Matric. No</th>
-                    <th>Course Code</th>
-                    <th>Ass. 1</th>
-                    <th>Ass. 2</th>
-                    <th>Ass. 3</th>
-                    <th>Ass. 4</th>
-                    <th>Ass. 5</th>
-                    <th>Average</th>
-                  </tr>
-                
-            <?php
-              //php block of code to display the selected data from database
-              $i = 1;
-              while ($row = $resultScoresheet->fetch_assoc()) {
+    <div id="content-wrapper">
+     
+    <div class="offset-md-2 col-md-8">
+    <h3 align="center" class="display-5">New Assignment</h3>
 
-                $matricNum = $row['matricNum'];
+  <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data" onsubmit= "return validate(this)">
 
-                //Mysql Query to select the name of the corresponding matric number from database
-                $queryStudent = "SELECT Name FROM student WHERE matricNum = '$matricNum'";
-                $resultStudent = $conn->query($queryStudent); 
 
-                while ($rowname = $resultStudent->fetch_assoc()) {
-                    $studentName = $rowname['Name'];
-                }
-                $ass1 = $row['Ass01']; $ass2 = $row['Ass02']; $ass3 = $row['Ass03'];
-                $ass4 = $row['Ass04']; $ass5 = $row['Ass05'];
-                $average = ($ass1 + $ass2 + $ass3 + $ass4 + $ass5)/5;
-                echo "<tr>";
-                echo '<td>'.$i.'</td>';
-                echo "<td>". $studentName."</td>";
-                echo "<td>". $matricNum."</td>";
-                echo "<td>".str_replace('_',' ',$row['courseCode'])."</td>";
-                echo "<td>". $ass1 ."</td>";
-                echo "<td>". $ass2."</td>";
-                echo "<td>". $ass3."</td>";
-                echo "<td>". $ass4."</td>";
-                echo "<td>". $ass5."</td>";
-                echo "<td>". $average."</td>";
-                echo "</tr>";
+    <div class="formgroup">
+      <textarea class="form-control" name="questiontext" Placeholder="Enter the Assignment Question" rows="5" cols="10"></textarea>
+      </div><br>
 
-              $i++;
+      <h4 align="center">OR</h4>
 
-              }//End of Php Block of code to display the selected data from database 
+      <div class="formgroup">
+      <input type="file" name="questionfile" >
+     </div><br>
 
-    ?>
-    </table>
+
+    <div class="form-group">
+      <select class="form-control" name="courseCode">
+        <option value="">--Select Course Code--</option>
+        <?php
+         foreach ($course_array as $course) {
+           echo "<option value = ".$course."> ".str_replace('_',' ',$course)."</option>";
+         }
+        ?>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <select class="form-control" name="assignmentId">
+        <option value="">--Select AssignmentId--</option>
+        <option value="Ass01">Assignment 1</option>
+        <option value="Ass02">Assignment 2</option>
+        <option value="Ass03">Assignment 3</option>
+        <option value="Ass04">Assignment 4</option>
+        <option value="Ass05">Assignment 5</option>
+      </select>
+    </div>
+
+
+    <div class="form-group">
+      <input type="text" class="form-control" name="score" Placeholder="Enter the Assigned Score">
+    </div>
+
+
+    <div class="form-group">
+    <label>Submission Date:</label>
+    <input type="date" name="date" class="form-control">
+    </div>
+
+    <div class="form-group">
+    <label>Submission Time:</label>
+    <input type="time" name="time" class="form-control">
+    </div>
+
+
+<div class="col-sm-12" align="center">
+<input type="submit" value="Submit" name="submit" class="btn btn-primary">
+</div>
+
+</form>
+
 </div>
 </div>
 </div>
@@ -217,6 +227,65 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 </div>
 
 </body> 
+
+<?php
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	
+// Testing if the post variables are not empty
+if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) || !empty($_POST['questiontext'])) && !empty($_POST['courseCode']) && !empty($_POST['score']) && !empty($_POST['date']) && !empty($_POST['time'])) {
+
+  $courseCode = $_POST['courseCode'];
+  $date = $_POST['date'];
+  $time = $_POST['time'];
+  $assignmentId =str_replace('_','',$courseCode).'_'.$_POST['assignmentId'];
+  $format = 'group';
+
+  $assignedDay = date("Y-m-d h:i:sa");
+  $submission = $date . ' ' . $time;
+  $submissiondate = strtotime($submission);
+
+  if (!empty($_FILES["questionfile"]["tmp_name"])){
+      $target_dir = "question_files/";
+      $question = $target_dir . basename($_FILES["questionfile"]["name"]);
+      move_uploaded_file($_FILES["questionfile"]["tmp_name"], $question);
+      $score = $_POST['score'];
+      $type = 'single';
+
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+    if($stmt->execute()){
+      echo "Data Inserted Successfully";
+    }
+    else{
+      echo "Data not Successfully Inserted " . $stmt->error;
+    }
+
+  }
+  elseif (!empty($_POST['questiontext'])) {
+     $question = $_POST['questiontext'];
+     $score = $_POST['score'];
+     $type = 'single';
+      
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+    if($stmt->execute()){
+      echo "Data Inserted Successfully";
+    }
+    else{
+      echo "Data not Successfully Inserted " . $stmt->error;
+    }
+
+  }
+}//End of validating if all the POST variables were sent
+else{
+	echo "Sorry, Fill in all the Fields";
+}//End of What to perform if the POST variables were not sent
+
+}//End of Confirming if the http request is a POST request
+
+
+?>
 
 <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
@@ -249,15 +318,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     <!-- Core plugin JavaScript-->
     <script src="Admin/dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Page level plugin JavaScript-->
-    <script src="Admin/dashboard/vendor/chart.js/Chart.min.js"></script>
-    <script src="Admin/dashboard/vendor/datatables/jquery.dataTables.js"></script>
-    <script src="Admin/dashboard/vendor/datatables/dataTables.bootstrap4.js"></script>
-
     <!-- Custom scripts for all pages-->
-    <script src="Admin/dashboard/js/sb-admin.min.js"></script>
+    <script src="Admin/dashboard/js/sb-admin.js"></script>
 
-    <!-- Demo scripts for this page-->
-    <script src="Admin/dashboard/js/demo/datatables-demo.js"></script>
-    <script src="Admin/dashboard/js/demo/chart-area-demo.js"></script>
-
+    

@@ -1,0 +1,18 @@
+1. Dashboard navbar should be sticky.
+2. Privacy policy, terms and condition for the footer.
+
+
+Service.
+Mover
+Driver
+Cleaning service
+Make up Artist
+Furniture Maker
+
+
+Product
+Phones, Tablets and Accessories
+Laptops and Computers
+Clothing
+Skin Care
+Hair and Accessories

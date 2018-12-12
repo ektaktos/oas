@@ -14,13 +14,7 @@ require_once "Admin/connect.php";
 		$assignmentId = $_SESSION['assID'];
 		$matricNum = $_SESSION['matric'];
 	}
-
-  if (strpos($assignmentId, '_') !== false) {
-    $arr = explode('_', $assignmentId);
-    $assId = $arr[0];
-     }else{
-      $assId = $assignmentId;
-     }
+    $assId = $assignmentId;
 
 if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
  	 
@@ -30,11 +24,11 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
 	$resultTutor = $conn->query($queryTutor);
 
-	$queryAssDetails = "SELECT assignmentQuestion,score FROM assignmentdetails WHERE assignmentId='$assignmentId'";
+	$queryAssDetails = "SELECT* FROM assignmentdetails WHERE assignmentId='$assId'";
 	$resultAssDetails = $conn->query($queryAssDetails);
 
  	// Mysql Query to select the details of assignments from database
-	$selectAssignment = "SELECT* FROM assignmentsubmission WHERE assignmentId='$assignmentId' AND matricNum = '$matricNum'";
+	$selectAssignment = "SELECT* FROM assignmentsubmission WHERE assignmentId='$assId' AND matricNum = '$matricNum'";
 	$resultAssignment = $conn->query($selectAssignment); 
 
   while ($row = $resultAssignment->fetch_assoc()) {
@@ -50,9 +44,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         }
   }
 
-
 	// Checking if the assignment has been graded for the student already 
-	$queryResult = "SELECT* FROM assignmentsubmission WHERE assignmentId = '$assignmentId' AND matricNum = '$matricNum' AND status = 'Graded'";
+	$queryResult = "SELECT* FROM assignmentsubmission WHERE assignmentId = '$assId' AND matricNum = '$matricNum' AND status = 'Graded'";
 	$resultResult = $conn->query($queryResult);
 
     while ($row = $resultTutor->fetch_assoc()) {
@@ -62,6 +55,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     while ($row = $resultAssDetails->fetch_assoc()) {
     	$question = $row['assignmentQuestion'];
     	$exp_score = $row['score'];
+      $type = $row['type'];
+      $format = $row['format'];
     }
 
  }
@@ -201,11 +196,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 <div class="offset-md-2 col-md-8" style=" margin: 30px 0px 0px 10%">
 	<h5 align="center"><u>Grade Assignment</u></h5>
 <p><strong>Course Name/Code:</strong> <?php echo str_replace('_',' ', $courseCode); ?></p>
-<p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
 <p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
-<?php  
+<?php 
+if ($format == 'individual') {
+if ($type == 'single') {
 if (isset($ass_path)) {
 ?>
+<p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
 <p><strong>Assignment File:</strong> <a target="_blank" href="<?php echo $ass_path; ?>"><?php echo $ass_file; ?></a></p>
 <?php
 }elseif (isset($answer)) {
@@ -236,16 +233,114 @@ if (isset($ass_path)) {
 				echo "<input type='text' class='form-control'  name='Score' Placeholder='Enter the Score'>";
 			}
 			else{
-				echo "<input type='text' class='form-control'  name='Score' Placeholder='Enter the Score'>";	
 			}
 		?>
 	</div>
-
 	<div class="col-sm-12" align="center">
 	<input type="submit" value="Submit" name="submit" class="btn btn-primary">
 	</div>
-
 </form>
+<?php
+  }elseif ($type == 'multiple') {
+    ?>
+    <table class="table">
+        <tr>
+          <td>Sn</td>
+          <td>Question</td>
+          <td>Answer</td>
+          <td>Assigned Score</td>
+          <td>Enter Score</td>
+          <td>Action</td>
+        </tr>
+        <?php
+      // Getting assignments that have been submitted from database
+      $querySelect1 = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND courseCode='$courseCode'";
+      $resultSelect1 = $conn->query($querySelect1);
+      if ($resultSelect1->num_rows > 0) {
+        while ($row2 = $resultSelect1->fetch_assoc()) {
+      $assIdArray[] = $row2['sub_AssId'];
+      }
+      $assignments_string = implode("','", $assIdArray);
+      }else{
+        $assignments_string = '';
+      }
+
+      $selectQuestion = "SELECT* FROM assignmentdetails WHERE assignmentId = '$assignmentId' AND sub_AssId IN ('$assignments_string')";
+      $resultQuestion = $conn->query($selectQuestion);
+      $rownum = $resultQuestion->num_rows;  $i = 0; $j=1;
+      while ($row1 = $resultQuestion->fetch_assoc()) {
+        $assId = $row1['sub_AssId'];
+        ?>
+      <form method="post" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+        <tr>
+          <td><?=$j?></td>
+          <td><?=$row1['assignmentQuestion']?></td>
+       <!-- Query to get the answer of a submitted question -->
+       <?php 
+       $selectAnswer = "SELECT* FROM assignmentsubmission WHERE sub_AssId = '$assId'";
+       $resultAnswer = $conn->query($selectAnswer);
+       // echo "Num is ". $resultAnswer->num_rows;
+       while ($row = $resultAnswer->fetch_assoc()) {
+         ?>
+         <td><?=$row['ass_answer']?></td>
+         <?php
+       }
+       ?>
+       <td><?=$row1['score']?></td>
+       <td><input class="form-control" name="Score" Placeholder=""></td>
+       <input type="hidden" name="subAssId" value="<?=$assId?>">
+       <td><input type="submit" name="submit" value="Submit" class="btn btn-primary"></td>
+       
+      </form>
+      <?php $j+=1;}
+  }
+  ?>
+  </tr>
+       </table><?php
+}//End of Action to perform for Individual Assignments 
+elseif ($format == 'group') {
+if ($type == 'single') {
+if (isset($ass_path)) {
+ ?>
+ <p><strong>Assignment File:</strong> <a target="_blank" href="<?php echo $ass_path; ?>"><?php echo $ass_file; ?></a></p>
+ <?php
+}elseif (isset($answer)) {
+ ?>
+ <p><strong>Assignment Answer:</strong><?php echo $answer; ?></p>
+
+ <?php
+ }
+?>
+ <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
+
+  <?php
+    if ($resultResult->num_rows > 0) {
+      echo "<p><strong>Score: </strong>".$graded_score."/".$exp_score."</p>";
+
+    }
+  ?>
+ <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+
+  <div class="form-group">
+    <?php
+      if ($resultResult->num_rows > 0) {
+        echo "<input type='text' class='form-control'  name='Score' Placeholder='Enter the Score' disabled>"; 
+      }
+      elseif (!empty($_GET['Id']) && !empty($_GET['matric'])) {
+        echo "<input type='text' class='form-control'  name='Score' Placeholder='Enter the Score'>";
+      }
+      else{
+      }
+    ?>
+  </div>
+  <input type="hidden" name="groupAssignment" value="groupAssignment">
+  <div class="col-sm-12" align="center">
+  <input type="submit" value="Submit" name="submit" class="btn btn-primary">
+  </div>
+</form>
+<?php
+ }}
+?>
 </div>
 </div>
 </div></div>
@@ -266,25 +361,91 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     $score = $_POST['Score'];
     $status = "Graded";
+    $arr = explode('_', $assId);
+    $ass_Id = $arr[1];
 
     if ($score > $exp_score) {
         echo "The Score cannot exceed the expected score";
         return;
     }
-
-		echo "The Score is " .$score;
+		// echo "The Score is " .$score;
 
 		// Renaming the name of the assignment file and folder
     if (isset($ass_path)) {
           $path = rename($ass_path, $newpath);
     }
 
-		// Checking if the assignment has been graded for the student already 
-		$queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
-		$resultResult = $conn->query($queryResult);
+    // What to perform if the submitted assignment is a group assignment
+    if (isset($_POST['groupAssignment'])) {
+      // Select the matric number of students in the group that submitted the assignment
+      $selectGroup = "SELECT members FROM group_members WHERE group_name ='$matricNum'"; 
+      $resultGroup = $conn->query($selectGroup);
+      while ($row = $resultGroup->fetch_assoc()) {
+        $members = $row['members'];
+      }
+        $membersArray = json_decode($members);
+    foreach ($membersArray as $key => $value) {
+      $matricNum = $value;
+      // Checking if the assignment has been graded for the student already 
+    $queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
+    $resultResult = $conn->query($queryResult);
+      if ($resultResult->num_rows < 1) {
+      // Saving the assignment in database
+      $stmt = $conn->prepare("INSERT INTO assignmentresult(courseCode,matricNum,".$ass_Id.") VALUES (?,?,?)");
+      $stmt->bind_param("sss",$courseCode,$matricNum,$score);
+
+     // Updating the assignmentsubmission table
+        $updateSubmisssion = "UPDATE assignmentsubmission SET status = '$status',ass_file_path = '$newpath' WHERE assignmentId='$assignmentId'";
+        $resultSubmission = $conn->query($updateSubmisssion);
+
+        if($stmt->execute() && $resultSubmission === TRUE){
+          ?>
+          <script type="text/javascript">
+            alert("Student Score Successfully Saved")
+            window.location = "tutor.php";
+          </script>
+          <?php
+        }
+        else{
+          echo "Student score not saved " . $stmt->error;
+        }
+    }
+    else{
+      $queryResult = "SELECT $ass_Id FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
+      $result = $conn->query($queryResult);
+      while ($row = $result->fetch_assoc()) {
+        $score_init = $row[$ass_Id];
+      }
+      // echo "THe initial score is " . $score_init;
+      $newscore = $score + $score_init;
+      // echo "THe new score is " . $newscore;
+      // echo "Assid is ".$assId;
+      // Updating the assignmentsubmission table
+        $updateSubmisssion = "UPDATE assignmentresult SET $ass_Id = '$newscore' WHERE courseCode='$courseCode' AND matricNum='$matricNum'";
+        $resultSubmission = $conn->query($updateSubmisssion);
+        if ($resultSubmission) {
+          ?>
+          <script type="text/javascript">
+            alert("Student Score Successfully Saved")
+            window.location = "tutor.php";
+          </script>
+          <?php
+          // Updating the assignmentsubmission table
+        $updateSubmisssion = "UPDATE assignmentsubmission SET status = '$status' WHERE assignmentId='$assignmentId'";
+        $resultSubmission = $conn->query($updateSubmisssion);
+
+        }
+    }
+    }//End of looping through the array of matric numbers. 
+    }
+    // If the assignment is not a group assignment 
+    else{
+    // Checking if the assignment has been graded for the student already 
+    $queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
+    $resultResult = $conn->query($queryResult);
 		if ($resultResult->num_rows < 1) {
 		 // Saving the assignment in database
-	        $stmt = $conn->prepare("INSERT INTO assignmentresult(courseCode,matricNum,".$assId.") VALUES (?,?,?)");
+	        $stmt = $conn->prepare("INSERT INTO assignmentresult(courseCode,matricNum,".$ass_Id.") VALUES (?,?,?)");
 		    $stmt->bind_param("sss",$courseCode,$matricNum,$score);
 
 		 // Updating the assignmentsubmission table
@@ -304,26 +465,32 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		    }
 		}
 		else{
-      $queryResult = "SELECT $assId FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
+      $queryResult = "SELECT $ass_Id FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
       $result = $conn->query($queryResult);
       while ($row = $result->fetch_assoc()) {
-        $score_init = $row[$assId];
+        $score_init = $row[$ass_Id];
       }
-      echo "THe initial score is " . $score_init;
+      // echo "THe initial score is " . $score_init;
       $newscore = $score + $score_init;
-      echo "THe new score is " . $newscore;
-      echo "Assid is ".$assId;
+      // echo "THe new score is " . $newscore;
+      // echo "Assid is ".$assId;
       // Updating the assignmentsubmission table
-        $updateSubmisssion = "UPDATE assignmentresult SET $assId = '$newscore' WHERE courseCode='$courseCode' AND matricNum='$matricNum'";
+        $updateSubmisssion = "UPDATE assignmentresult SET $ass_Id = '$newscore' WHERE courseCode='$courseCode' AND matricNum='$matricNum'";
         $resultSubmission = $conn->query($updateSubmisssion);
         if ($resultSubmission) {
-          echo "Update Successful";
+          ?>
+          <script type="text/javascript">
+            alert("Student Score Successfully Saved")
+            window.location = "tutor.php";
+          </script>
+          <?php
           // Updating the assignmentsubmission table
         $updateSubmisssion = "UPDATE assignmentsubmission SET status = '$status' WHERE assignmentId='$assignmentId' AND matricNum='$matricNum'";
         $resultSubmission = $conn->query($updateSubmisssion);
 
         }
 		}
+  }
 	}
 }
 

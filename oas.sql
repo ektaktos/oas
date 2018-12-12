@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2018 at 10:43 AM
+-- Generation Time: Dec 12, 2018 at 07:00 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.1.18
 
@@ -95,12 +95,14 @@ INSERT INTO `article` (`sn`, `articleName`, `articlePath`, `tutorName`, `uploade
 
 CREATE TABLE `assignmentdetails` (
   `sn` int(11) NOT NULL,
-  `assignmentId` varchar(15) NOT NULL,
+  `assignmentId` varchar(20) NOT NULL,
+  `sub_AssId` varchar(20) NOT NULL,
   `assignmentQuestion` varchar(250) NOT NULL,
   `tutor` varchar(45) NOT NULL,
   `tutorId` varchar(15) NOT NULL,
   `courseCode` varchar(15) NOT NULL,
   `type` enum('','single','multiple') NOT NULL,
+  `format` enum('','individual','group') NOT NULL,
   `dateAssigned` datetime NOT NULL,
   `submissionDate` datetime NOT NULL,
   `score` int(11) NOT NULL
@@ -110,14 +112,16 @@ CREATE TABLE `assignmentdetails` (
 -- Dumping data for table `assignmentdetails`
 --
 
-INSERT INTO `assignmentdetails` (`sn`, `assignmentId`, `assignmentQuestion`, `tutor`, `tutorId`, `courseCode`, `type`, `dateAssigned`, `submissionDate`, `score`) VALUES
-(1, 'Ass01', 'Who Discovered River Niger', 'Wale', 'Tim01', 'GES_101', 'single', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 10),
-(2, 'Ass03', 'How old was Mungo Park when he died?', 'Wale', 'Tim01', 'GES_102', 'single', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 10),
-(7, 'Ass01', 'question_files/7389-translation-authors.rtf', 'Alabi Wale', 'Tim01', 'ges_101', 'single', '2018-09-04 04:54:44', '2016-07-02 13:52:00', 15),
-(20, 'Ass02_1', 'ldmz.kn d.kvns;gkd;kdl/mvdk', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', '2018-11-21 09:58:02', '2018-11-28 00:30:00', 2),
-(21, 'Ass02_2', 'v s.cmv fdvfdjvnkngregner;o.gnw', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', '2018-11-21 09:58:02', '2018-11-28 00:30:00', 3),
-(22, 'Ass02_3', ',vdfds.klvndfkbnfkgngneo;wgno', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', '2018-11-21 09:58:02', '2018-11-28 00:30:00', 3),
-(23, 'Ass02_4', 'lfwd;.kvnefkgnw;qkgnfkogner;gw/o', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', '2018-11-21 09:58:02', '2018-11-28 00:30:00', 3);
+INSERT INTO `assignmentdetails` (`sn`, `assignmentId`, `sub_AssId`, `assignmentQuestion`, `tutor`, `tutorId`, `courseCode`, `type`, `format`, `dateAssigned`, `submissionDate`, `score`) VALUES
+(1, 'Ass01', '', 'Who Discovered River Niger', 'Wale', 'Tim01', 'GES_101', 'single', 'individual', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 10),
+(2, 'Ass03', '', 'How old was Mungo Park when he died?', 'Wale', 'Tim01', 'GES_102', 'single', 'individual', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 10),
+(7, 'Ass04', '', 'question_files/7389-translation-authors.rtf', 'Alabi Wale', 'Tim01', 'GES_101', 'single', 'individual', '2018-09-04 04:54:44', '2016-07-02 13:52:00', 15),
+(20, 'Ass02', 'Ass02_1', 'ldmz.kn d.kvns;gkd;kdl/mvdk', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', 'individual', '2018-11-30 09:58:02', '2018-12-30 18:30:00', 2),
+(21, 'Ass02', 'Ass02_2', 'vbhsdbodslznkmv', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', 'individual', '2018-11-30 09:58:02', '2018-12-30 18:30:00', 3),
+(22, 'Ass02', 'Ass02_3', ',vdfds.klvndfkbnfkgngneo;wgno', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', 'individual', '2018-11-30 09:58:02', '2018-12-30 18:30:00', 3),
+(23, 'Ass02', 'Ass02_4', 'lfwd;.kvnefkgnw;qkgnfkogner;gw/o', 'Alabi Wale', 'Tim01', 'GES_102', 'multiple', 'individual', '2018-11-30 09:58:02', '2018-12-30 18:30:00', 3),
+(25, 'GES102_Ass01', '', 'lm\'bvlfms\'bbdk\'psjfodsygfuhjdsfoies;', 'Alabi Wale', 'Tim01', 'GES_102', 'single', '', '2018-12-06 08:32:12', '2018-12-18 23:40:00', 5),
+(26, 'GES102_Ass02', '', 'kjdfbsdkjvhbdsfhsagfsakufbsdvhgsdfusbdkuyasdgfadsku', 'Alabi Wale', 'Tim01', 'GES_102', 'single', 'group', '2018-12-12 12:27:49', '2018-12-26 00:30:00', 10);
 
 -- --------------------------------------------------------
 
@@ -142,7 +146,8 @@ CREATE TABLE `assignmentresult` (
 
 INSERT INTO `assignmentresult` (`sn`, `courseCode`, `matricNum`, `Ass01`, `Ass02`, `Ass03`, `Ass04`, `Ass05`) VALUES
 (1, 'GES_101', '13/0274', 8, 0, 0, 0, 0),
-(2, 'GES_102', '13/0274', 0, 7, 0, 0, 0);
+(2, 'GES_102', '13/0274', 0, 10, 0, 0, 0),
+(3, 'GES_102', '13/0297', 0, 10, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -153,8 +158,10 @@ INSERT INTO `assignmentresult` (`sn`, `courseCode`, `matricNum`, `Ass01`, `Ass02
 CREATE TABLE `assignmentsubmission` (
   `sn` int(11) NOT NULL,
   `assignmentId` varchar(15) NOT NULL,
+  `sub_AssId` varchar(10) NOT NULL,
   `courseCode` varchar(15) NOT NULL,
   `matricNum` varchar(15) NOT NULL,
+  `format` enum('','individual','group') NOT NULL,
   `ass_file_path` varchar(45) NOT NULL,
   `ass_answer` text NOT NULL,
   `status` varchar(15) NOT NULL,
@@ -165,11 +172,11 @@ CREATE TABLE `assignmentsubmission` (
 -- Dumping data for table `assignmentsubmission`
 --
 
-INSERT INTO `assignmentsubmission` (`sn`, `assignmentId`, `courseCode`, `matricNum`, `ass_file_path`, `ass_answer`, `status`, `date`) VALUES
-(1, 'Ass01', 'GES_101', '13/0274', 'graded_ass_files/ECOMMERCE SLA TARIFF.pdf', '', 'Graded', '0000-00-00 00:00:00'),
-(2, 'Ass03', 'GES_101', '13/0274', 'sub_ass_files/questions.txt', '', 'UnGraded', '2018-09-06 05:44:14'),
-(3, 'Ass02_3', 'GES_102', '13/0274', '', 'dknvdvfdvbdfhvhsbjsd.n;kr;na', 'Graded', '2018-11-21 10:04:28'),
-(5, 'Ass02_2', 'GES_102', '13/0274', '', 'dnvjdvnlasd ndsljdsnvlisa;daiivndjvndfivjijeoifwqjpgferpiqj', 'Graded', '2018-11-21 11:09:41');
+INSERT INTO `assignmentsubmission` (`sn`, `assignmentId`, `sub_AssId`, `courseCode`, `matricNum`, `format`, `ass_file_path`, `ass_answer`, `status`, `date`) VALUES
+(1, 'Ass02', 'Ass02_1', 'GES_102', '13/0274', '', '', 'hboijhmkjpoi;lkkm;okl', 'UnGraded', '2018-12-06 10:48:09'),
+(2, 'Ass02', 'Ass02_2', 'GES_102', '13/0274', '', '', 'mvmpdvnslijweapgidkvmpd;adfb', 'UnGraded', '2018-12-06 10:57:03'),
+(3, 'Ass02', 'Ass02_3', 'GES_102', '13/0274', '', '', 'mvmpdvnslijweapgidkvmpd;adfb', 'UnGraded', '2018-12-06 10:59:07'),
+(6, 'GES102_Ass02', '', 'GES_102', 'Group1', 'group', 'graded_ass_files/n.txt', '', 'Graded', '2018-12-12 02:03:31');
 
 -- --------------------------------------------------------
 
@@ -200,6 +207,27 @@ INSERT INTO `course` (`sn`, `courseCode`, `courseName`, `unit`, `level`, `semest
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `group_members`
+--
+
+CREATE TABLE `group_members` (
+  `sn` int(11) NOT NULL,
+  `group_name` varchar(25) NOT NULL,
+  `groupId` varchar(25) NOT NULL,
+  `courseCode` varchar(15) NOT NULL,
+  `members` varchar(200) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `group_members`
+--
+
+INSERT INTO `group_members` (`sn`, `group_name`, `groupId`, `courseCode`, `members`) VALUES
+(1, 'Group1', '', 'GES_102', '[\"13/0274\",\"13/0297\"]');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `student`
 --
 
@@ -220,7 +248,7 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`sn`, `Name`, `MatricNum`, `courses`, `phone`, `email`, `password`, `current_semester`) VALUES
 (1, 'Wale Timothy', '13/0274', '[\"GES_101\",\"GES_102\"]', '08101662910', 'tim@gmail.com', '31dd7529f9d284a85eee6d5b2116c678', ''),
-(2, 'Oregunwa Segun', '13/0297', '', '08101662910', 'awtim01@gmail.com', 'cfb55f33bab7243f9bb5aa466303929c', '1.1');
+(2, 'Oregunwa Segun', '13/0297', '[\"GES_100\",\"GES_102\"]', '08101662910', 'awtim01@gmail.com', 'cfb55f33bab7243f9bb5aa466303929c', '1.1');
 
 -- --------------------------------------------------------
 
@@ -292,6 +320,12 @@ ALTER TABLE `course`
   ADD PRIMARY KEY (`sn`);
 
 --
+-- Indexes for table `group_members`
+--
+ALTER TABLE `group_members`
+  ADD PRIMARY KEY (`sn`);
+
+--
 -- Indexes for table `student`
 --
 ALTER TABLE `student`
@@ -329,25 +363,31 @@ ALTER TABLE `article`
 -- AUTO_INCREMENT for table `assignmentdetails`
 --
 ALTER TABLE `assignmentdetails`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `assignmentresult`
 --
 ALTER TABLE `assignmentresult`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `assignmentsubmission`
 --
 ALTER TABLE `assignmentsubmission`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `course`
 --
 ALTER TABLE `course`
   MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `group_members`
+--
+ALTER TABLE `group_members`
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `student`

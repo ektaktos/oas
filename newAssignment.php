@@ -114,6 +114,13 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           </a>
         </li>
 
+        <li class="nav-item">
+          <a class="nav-link" href="creategroup.php">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Create Group</span>
+          </a>
+        </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="#">
             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -122,7 +129,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="newAssignment.php">
+          <a class="nav-link" href="groupAssignment.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>New Group Assignment</span>
           </a>
@@ -260,7 +267,6 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
          foreach ($course_array as $course) {
            echo "<option value = ".$course."> ".str_replace('_',' ',$course)."</option>";
          }
-
         ?>
       </select>
     </div>
@@ -268,11 +274,11 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     <div class="form-group">
       <select class="form-control" name="assignmentId">
         <option value="">--Select AssignmentId--</option>
-        <option>Assignment 1</option>
-        <option>Assignment 2</option>
-        <option>Assignment 3</option>
-        <option>Assignment 4</option>
-        <option>Assignment 5</option>
+        <option value="Ass01">Assignment 1</option>
+        <option value="Ass02">Assignment 2</option>
+        <option value="Ass03">Assignment 3</option>
+        <option value="Ass04">Assignment 4</option>
+        <option value="Ass05">Assignment 5</option>
       </select>
     </div>
 
@@ -324,8 +330,9 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
   $courseCode = $_POST['courseCode'];
   $date = $_POST['date'];
   $time = $_POST['time'];
-  $assignmentId = $_POST['assignmentId'];
-  
+  $assignmentId =str_replace('_','',$courseCode).'_'.$_POST['assignmentId'];
+  $format = 'individual';
+
   $assignedDay = date("Y-m-d h:i:sa");
   $submission = $date . ' ' . $time;
   $submissiondate = strtotime($submission);
@@ -343,10 +350,10 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       for ($i=1; $i <= 4; $i++) {
       $question = $questionArray[0][$i];
       $score = $scoreArray[0][$i];
-      $assId = $assignmentId.'_'.$i;
+      $subassId = $assignmentId.'_'.$i;
       
-     $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
-      $stmt->bind_param("sssssssss",$assId,$question,$tutorName,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
+     $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,sub_AssId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+      $stmt->bind_param("sssssssssss",$assId,$subassId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
       if($stmt->execute()){
         // echo "Data Inserted Successfully";
       }
@@ -363,8 +370,8 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       $score = $_POST['score'];
       $type = 'single';
 
-      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
     if($stmt->execute()){
       echo "Data Inserted Successfully";
     }
@@ -379,8 +386,8 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
      $score = $_POST['score'];
      $type = 'single';
       
-      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$type,$assignedDay,$submission,$score);
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
     if($stmt->execute()){
       echo "Data Inserted Successfully";
     }
@@ -389,36 +396,6 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
     }
 
   }
-
-
-
-    // // Selecting the name of tutor from database
-    // $selectTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
-    // $result = $conn->query($selectTutor);
-
-    // $selectId = "SELECT assignmentId FROM assignmentdetails WHERE courseCode = '$courseCode'";
-    // $resultId = $conn->query($selectId);
-    // $row = $resultId->fetch_assoc();
-    // $len = count($row,1);
-    // $numId = $resultId->num_rows;
-
-    // if ($numId >= 1) {
-    //     $assId = $row[$len-1];
-    //     $last = substr($assId, -1);
-    //     $last += 1;
-    //     $assignmentId = substr_replace($assId, $last, -1);
-    // }
-
-    // $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?)");
-    // $stmt->bind_param("ssssssss",$assignmentId,$question,$tutor,$tutorId,$courseCode,$assignedDay,$submission,$score);
-    // if($stmt->execute()){
-    //   echo "Data Inserted Successfully";
-    // }
-    // else{
-    //   echo "Data not Successfully Inserted " . $stmt->error;
-    // }
-
-
 }//End of validating if all the POST variables were sent
 else{
 	echo "Sorry, Fill in all the Fields";

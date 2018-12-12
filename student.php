@@ -181,6 +181,62 @@ $resultStudent = $conn->query($queryStudent);
               </tbody>
             </table>
 
+            <!-- Breadcrumbs-->
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#">Group Assignments</a>
+            </li>
+<!--             <li class="breadcrumb-item active"></li>
+ -->          </ol>
+          <div class="row">
+          <?php
+          
+                // Getting assignments that have been submitted but not graded from database
+                // Mysql Query to select the details of assignments from database
+                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND format = 'group'";
+                $resultQuestion = $conn->query($selectQuestion); 
+
+                if ($resultQuestion->num_rows < 1) {
+                    // echo "Error" . $conn->error;
+                }
+                else{
+                  while ($row1 = $resultQuestion->fetch_assoc()) {
+                    
+              echo "<div class='col-xl-4 col-sm-4 mb-3'>";
+              echo "<div class='card text-white bg-success o-hidden h-100'>";
+                echo "<div class='card-body'>";
+                  echo "<div class='card-body-icon'>";
+                    echo "<i class='fas fa-fw fa-comments'></i>";
+                  echo "</div>";
+                  echo "<div class='mr-5'>";
+                  if ($row1['type'] == 'single') {
+                    echo "<span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>";
+                  }else{
+                    echo "<span class='assignmentTitle'><b>Question: Multiple Question</b></span><br>";
+                  }
+                 
+                  echo "<span>Course Code: <b>".str_replace('_',' ',$row1['courseCode'])."</b></span><br>";
+                  echo "<span>Assignment Id: <b>".$row1['assignmentId']."</b></span><br>";
+                  echo "<span class='assignmentDetails'> Tutor: <b>".$row1['tutor']."</b></span><br>";
+                  echo "<span>Date Assigned: <b>".date("M j, Y",strtotime($row1['dateAssigned']))."</b></span><br>";
+                  echo "<span>Submission Deadline: <b>".date("M j, Y",strtotime($row1['submissionDate']))."</b></span><br>";
+                  echo "<span>Submission Time: <b>".date("h:ia",strtotime($row1['submissionDate']))."</b></span><br>";
+                  echo "<span>Expected Score: <b>".$row1['score']."</b></span>
+                  </div>";
+                echo "</div>";
+                echo "<a class='card-footer text-white clearfix small z-1' href='submitGroup.php?Id=".$row1['assignmentId']."'>";
+                  echo "<span class='float-left'>Submit Assignment</span>";
+                  echo "<span class='float-right'>";
+                    echo "<i class='fas fa-angle-right'></i>";
+                  echo "</span>";
+                echo "</a>";
+              echo "</div>";
+            echo "</div>";
+            }
+            }
+          ?>
+          </div>
+
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
               <a href="#">Assignments</a>
@@ -191,7 +247,7 @@ $resultStudent = $conn->query($queryStudent);
           <?php
              
                 // Getting assignments that have been submitted but not graded from database
-                $querySelect = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND status='UnGraded'";
+                $querySelect = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND status='UnGraded' GROUP BY AssignmentId";
                 $resultSelect = $conn->query($querySelect);
                 $rownum = $resultSelect->num_rows;
              
@@ -199,12 +255,18 @@ $resultStudent = $conn->query($queryStudent);
                   while ($row = $resultSelect->fetch_assoc()) {
                       echo "<hr>"; 
                       $assignmentId = $row['assignmentId'];
-                      $courseCode = str_replace('_',' ',$row['courseCode']);
+                      $courseCode = $row['courseCode'];
                       $matricnum = $row['matricNum'];
-                      $ass_path = $row['ass_file_path'];
 
-                      $arr = explode('/', $ass_path);
+                    if (!empty($row['ass_file_path'])) {
+                      $filePath = $row['ass_file_path'];
+                      $arr = explode('/', $filePath);
                       $ass_file = $arr[1];
+                      $answer = "<a href='".$filePath."' target='_blank'>".$ass_file."</a>";
+                    }
+                    elseif (!empty($row['ass_answer'])) {
+                      $answer = $row['ass_answer'];
+                    }
 
               echo "<div class='col-xl-4 col-sm-4 mb-3'>";
               echo "<div class='card text-white bg-success o-hidden h-100'>";
@@ -213,15 +275,14 @@ $resultStudent = $conn->query($queryStudent);
                     echo "<i class='fas fa-fw fa-comments'></i>";
                   echo "</div>";
                   echo "<div class='mr-5'>
-                  <h5 align='center'>Assignment has not been graded</h5>
+                  <h5 align='center'>Submitted but not Graded</h5>
                   <span>Assignment Id: ".$assignmentId."</span><br>
-                  <span>Course Code: ".$courseCode."</span><br>
-                  <span class='fileName'>Submitted File: ".$ass_file."</span><br>
+                  <span>Course Code: ".str_replace('_',' ',$courseCode)."</span><br>
                   <span>Date Assigned:".date("M j, Y",strtotime($row['date']))."</span><br>
                   <span class='fileDetails'> Matric Num: ".$matricnum."</span><br>
                   </div>";
                 echo "</div>";
-                echo "<a class='card-footer text-white clearfix small z-1' href='checkScore.php?Id=".$assignmentId."&matric=".$matricnum."'>";
+                echo "<a class='card-footer text-white clearfix small z-1' href='checkScore.php?Id=".$assignmentId."&matric=".$matricnum."&course=".$courseCode."'>";
                   echo "<span class='float-left'>View Details</span>";
                   echo "<span class='float-right'>";
                     echo "<i class='fas fa-angle-right'></i>";
@@ -235,20 +296,22 @@ $resultStudent = $conn->query($queryStudent);
                 // Getting assignments that have been submitted from database
                 $querySelect1 = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum'";
                 $resultSelect1 = $conn->query($querySelect1);
+                if ($resultSelect1->num_rows > 0) {
                 while ($row2 = $resultSelect1->fetch_assoc()) {
-                  
                   $assIdArray[] = $row2['assignmentId'];
                 }
-
-                 $assingnments_string = implode("','", $assIdArray);
+                 $assignments_string = implode("','", $assIdArray);
+                }else{
+                  $assignments_string = '';
+                }
 
                 // Getting assignments that have not been submitted yet
                 // Mysql Query to select the details of assignments from database
-                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND assignmentId NOT IN ('$assingnments_string')";
+                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND assignmentId NOT IN ('$assignments_string') AND format = 'individual' GROUP BY AssignmentId";
                 $resultQuestion = $conn->query($selectQuestion); 
 
                 if ($resultQuestion->num_rows < 1) {
-                    echo "Error" . $conn->error;
+                    // echo "Error" . $conn->error;
                 }
                 else{
                   while ($row1 = $resultQuestion->fetch_assoc()) {
@@ -259,19 +322,24 @@ $resultStudent = $conn->query($queryStudent);
                   echo "<div class='card-body-icon'>";
                     echo "<i class='fas fa-fw fa-comments'></i>";
                   echo "</div>";
-                  echo "<div class='mr-5'>
-                  <span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>
-                  <span>Course Code: <b>".str_replace('_',' ',$row1['courseCode'])."</b></span><br>
-                  <span>Assignment Id: <b>".$row1['assignmentId']."</b></span><br>
-                  <span class='assignmentDetails'> Tutor: <b>".$row1['tutor']."</b></span><br>
-                  <span>Date Assigned: <b>".date("M j, Y",strtotime($row1['dateAssigned']))."</b></span><br>
-                  <span>Submission Deadline: <b>".date("M j, Y",strtotime($row1['submissionDate']))."</b></span><br>
-                  <span>Submission Time: <b>".date("h:ia",strtotime($row1['submissionDate']))."</b></span><br>
-                  <span>Expected Score: <b>".$row1['score']."</b></span>
+                  echo "<div class='mr-5'>";
+                  if ($row1['type'] == 'single') {
+                    echo "<span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>";
+                  }else{
+                    echo "<span class='assignmentTitle'><b>Question: Multiple Question</b></span><br>";
+                  }
+                 
+                  echo "<span>Course Code: <b>".str_replace('_',' ',$row1['courseCode'])."</b></span><br>";
+                  echo "<span>Assignment Id: <b>".$row1['assignmentId']."</b></span><br>";
+                  echo "<span class='assignmentDetails'> Tutor: <b>".$row1['tutor']."</b></span><br>";
+                  echo "<span>Date Assigned: <b>".date("M j, Y",strtotime($row1['dateAssigned']))."</b></span><br>";
+                  echo "<span>Submission Deadline: <b>".date("M j, Y",strtotime($row1['submissionDate']))."</b></span><br>";
+                  echo "<span>Submission Time: <b>".date("h:ia",strtotime($row1['submissionDate']))."</b></span><br>";
+                  echo "<span>Expected Score: <b>".$row1['score']."</b></span>
                   </div>";
                 echo "</div>";
                 echo "<a class='card-footer text-white clearfix small z-1' href='upload.php?Id=".$row1['assignmentId']."'>";
-                  echo "<span class='float-left'>View Details</span>";
+                  echo "<span class='float-left'>Submit Assignment</span>";
                   echo "<span class='float-right'>";
                     echo "<i class='fas fa-angle-right'></i>";
                   echo "</span>";
@@ -296,7 +364,7 @@ $resultStudent = $conn->query($queryStudent);
           <?php
              
           // Mysql Query to select all the Graded assignments from database
-          $selectSubmAssignment1 = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='Graded'";
+          $selectSubmAssignment1 = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='Graded' GROUP BY AssignmentId";
           $resultSubmAssignment1 = $conn->query($selectSubmAssignment1); 
 
 
@@ -323,7 +391,7 @@ $resultStudent = $conn->query($queryStudent);
                    }
 
                 // Query to slect the score of the selected assignment
-                $queryscore = "SELECT * FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum='$matricnum'";
+                $queryscore = "SELECT * FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum='$matricnum' ";
                 $resultscore = $conn->query($queryscore); 
 
                 while ($row = $resultscore->fetch_assoc()) {
@@ -344,7 +412,7 @@ $resultStudent = $conn->query($queryStudent);
 
                   </div>";
                 echo "</div>";
-                echo "<a class='card-footer text-white clearfix small z-1' href='checkScore.php?Id=".$assignmentId."&matric=".$matricnum."'>";
+                echo "<a class='card-footer text-white clearfix small z-1' href='checkScore.php?Id=".$assignmentId."&matric=".$matricnum."&course=".$courseCode."'>";
                   echo "<span class='float-left'>View Details</span>";
                   echo "<span class='float-right'>";
                     echo "<i class='fas fa-angle-right'></i>";
