@@ -9,6 +9,7 @@ require_once "Admin/connect.php";
     $assignmentId = $_GET['Id'];
 		$matricNum = $_GET['matric'];
 		$_SESSION['matric'] = $matricNum;
+    $studmatric = $_SESSION['oas_studmatricNum'];
 	}
 	else{
 		$assignmentId = $_SESSION['assID'];
@@ -17,7 +18,7 @@ require_once "Admin/connect.php";
 
   if (strpos($assignmentId, '_') !== false) {
     $arr = explode('_', $assignmentId);
-    $assId = $arr[0];
+    $assId = $arr[1];
   }else{
     $assId = $assignmentId;
   }
@@ -26,10 +27,10 @@ require_once "Admin/connect.php";
 if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) {
     
 
-   $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
+  $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$studmatric'";
 	$resultStudent = $conn->query($queryStudent);
 
-	$queryAssDetails = "SELECT assignmentQuestion,score FROM assignmentdetails WHERE assignmentId='$assignmentId'";
+	$queryAssDetails = "SELECT assignmentQuestion,score,format FROM assignmentdetails WHERE assignmentId='$assignmentId'";
 	$resultAssDetails = $conn->query($queryAssDetails);
 
  	// Mysql Query to select the details of assignments from database
@@ -37,7 +38,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 	$resultAssignment = $conn->query($selectAssignment); 
 
 	// Checking if the assignment has been graded for the student already 
-	$queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$matricNum'";
+	$queryResult = "SELECT* FROM assignmentresult WHERE courseCode = '$courseCode' AND matricNum = '$studmatric'";
 	$resultResult = $conn->query($queryResult);
 
     while ($row = $resultStudent->fetch_assoc()) {
@@ -47,6 +48,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
     while ($row = $resultAssDetails->fetch_assoc()) {
     	$question = $row['assignmentQuestion'];
     	$exp_score[] = $row['score'];
+      $format = $row['format'];
     }
     $exp_score = array_sum($exp_score);
     
@@ -81,11 +83,11 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 <head>
 <link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>Check Score-Online Assignment Submission</title>
+<title>Check Score- ASG</title>
  <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -103,7 +105,10 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-      <a class="navbar-brand mr-1" href="index.html">OAS</a>
+      <a class="navbar-brand mr-1" href="student.php">
+        <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+        <span style="color: white;">ASG System</span>
+      </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
@@ -147,6 +152,10 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 <p><strong>Course Name/Code:</strong> <?php echo str_replace('_',' ',$courseCode);  ?></p>
 <p><strong>Assignment Id:</strong> <?php echo $assignmentId;  ?></p>
 <p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
+<?php 
+  if ($format == 'individual') {
+
+?>
 <p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
 
 <P><strong>Assignment File:</strong> <?=$answer?> </P>
@@ -159,6 +168,20 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 		}
     else{
       echo "<p><strong>Submission Status: </strong> Not Graded</p>";
+    } }elseif($format == 'group'){
+    ?>
+    <p><strong>Group Name:</strong> <?php echo $matricNum; ?></p>
+
+    <p><strong>Assignment File:</strong> <?=$answer?> </p>
+
+    <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
+    <?php
+    if ($resultResult->num_rows > 0) {
+      echo "<p><strong>Score: </strong>".$graded_score."/".$exp_score."</p>";
+    }
+    else{
+      echo "<p><strong>Submission Status: </strong> Not Graded</p>";
+    }
     }
 	?>
 
@@ -166,12 +189,15 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 </div>
 </div>
 
-<div class="container-fluid col-sm-12">
-    <footer class="footer">
-         <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
-      </footer>
-</div>
+<!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid">
+          <div class="container my-auto">
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+            </div>
+          </div>
+        </footer>
+
 
 </body> 
 

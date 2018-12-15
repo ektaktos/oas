@@ -11,6 +11,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta name="description" content="">
 <meta name="author" content="">
 <link rel="icon" href="favicon.jpeg">
@@ -24,18 +25,17 @@ $resultSelectCourse = $conn->query($querySelectCourse);
     <!-- Custom styles for this template-->
     <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
 
-<title>Register - Online Assignment Submission System</title>
+<title>Register - ASG</title>
 
 </head>
 
-<body class="bg-dark">
-	<!-- Main jumbotron for -->
-   <div class="jumbotron">
-      <div class="container" align="center">
-      <h1 align="center">Online Assignment Submission System</h1>
-      <p align="center">Registration</p>
-      </div>
-    </div><!-- End of Main Jumbotron-->
+<body class="bg-light">
+	<nav class="navbar navbar-light bg-dark">
+  <a class="navbar-brand" href="#">
+    <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+    <span style="color: white;">ASG System</span>
+  </a>
+</nav>
 
 
 <div class="container div">
@@ -116,13 +116,15 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 
 
 <!-- FOOTER -->
-   
-<div class="container-fluid col-sm-12">
-    <footer class="footer">
-         <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> OAS System </p>
-      </footer>
-</div>
+ <!-- Sticky Footer -->
+        <footer class="sticky-footer" style="margin-top: 120px; text-align: center;">
+          <div class="container my-auto">
+            <div class="">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+            </div>
+          </div>
+        </footer>
+    <!-- Scroll to Top Button-->
  
 </body>
 </html>
@@ -160,20 +162,21 @@ if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['
     $stmt->bind_param("ssssss",$name,$matricNum,$phone,$email,$passwrd,$semester);
 
     if($stmt->execute()){
-      echo "Data Inserted Successfully";
-       ?>
-    <script>
-        document.getElementById("message").innerHTML = "Registration Successful";
-        document.getElementById("message").style.color = "green";
-    </script>
-    <?php
-      
+      ?>
+     <script>
+      alert("Registration Successful, proceed to login");
+     window.location.href = 'index.php';
+     </script>
+     <?php
     }
     else{
       echo "Data not Successfully Inserted" . $stmt->error;
        ?>
-      <script type="text/javascript">alert('Data Not Inserted');</script>
-      <?php
+    <script>
+        document.getElementById("message").innerHTML = "Registration Not Successful, Please try again";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
     }
 
   }//End of what to perform when the course has not been registered yet
@@ -190,10 +193,14 @@ if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['
   }//End of what to perform when the course is registered already
 
 }//End of validating that the POST variables are not empty
+else{
 ?>
-      <!-- <script type="text/javascript">alert('Data Fields cannot be empty');</script> -->
-      <?php
-
+      <script>
+        document.getElementById("message").innerHTML = "Text Fields cannot be empty";
+        document.getElementById("message").style.color = "red";
+    </script>
+<?php
+}
 }//End of validating that the request method is a POST method
 
 

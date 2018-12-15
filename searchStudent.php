@@ -38,13 +38,12 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 <!DOCTYPE html>
 <head>
-<link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>Search Student-Online Assignment Submission</title>
+<title>Search Student - ASG</title>
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -64,8 +63,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 <!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
 
           <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span >Dashboard</span>
+            <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+            <span style="color: white;">ASG System</span>
           </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -235,12 +234,14 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     </div>
     </div>    
 
-  <div class="container-fluid col-sm-12">
-      <footer class="footer">
-           <hr>
-         <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
+  <!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid">
+          <div class="container my-auto">
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+            </div>
+          </div>
         </footer>
-  </div>
 
 </body> 
 </html>

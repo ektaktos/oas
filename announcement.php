@@ -50,10 +50,11 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Announcement - OAS</title>
+    <title>Announcement - ASG</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -72,12 +73,9 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
   <body id="page-top">
 
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-
-<!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
-
           <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span >Dashboard</span>
+            <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+            <span style="color: white;">ASG System</span>
           </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -179,7 +177,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
           </a>
         </li>
 
-        <li class="nav-item">
+        <li class="nav-item active">
           <a class="nav-link" href="announcement.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Announcement</span>
@@ -193,7 +191,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
           </a>
         </li>
 
-       <li class="nav-item active">
+       <li class="nav-item">
           <a class="nav-link" href="articleEntry.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Article Entry</span>
@@ -207,6 +205,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
       <div id="content-wrapper">
 
         <div class="container">
+          <div id="message" style="text-align: center; margin-top: 5px;"></div>
           <h4 style="margin: 10px 0px 20px 0px; text-align: center;">Announcements</h4>
           <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
           <div class="col-sm-7" style="border:2px solid #dddddd;">
@@ -220,7 +219,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
             <textarea class="form-control" name="content"></textarea>
           </div>
           <div class="form-group">
-            <input type="submit" class="btn btn-primary">
+            <input type="submit" class="btn btn-primary" value="Save">
           </div>
          </form>
          </div>
@@ -278,7 +277,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
         <footer class="sticky-footer">
           <div class="container my-auto">
             <div class="copyright text-center my-auto">
-              <span>Copyright © Your Website 2018</span>
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
             </div>
           </div>
         </footer>
@@ -341,16 +340,27 @@ if (!empty($_POST['title']) && !empty($_POST['content'])) {
   $title = fix_string($_POST['title']);
   $content = fix_string($_POST['content']);
   $date = date("Y-m-d h:i:sa");
+  $visible = 1;
 
   $stmt = $conn->prepare("INSERT INTO announcement (title,content,tutor_id,date,visible) VALUES (?,?,?,?,?)");
-  $stmt->bind_param("sssss",$title,$content,$tutorId,$date,'1');
+  $stmt->bind_param("sssss",$title,$content,$tutorId,$date,$visible);
 
   if($stmt->execute()){
      echo "Data Inserted Successfully";
-     ?><script>window.location.href = 'announcement.php'</script><?php
+     ?>
+     <script>
+      alert("Announcement saved successfully");
+     window.location.href = 'announcement.php'
+     </script>
+     <?php
   }
   else{
-      echo "Data not Successfully Inserted" . $stmt->error;
+     ?>
+    <script>
+        document.getElementById("message").innerHTML = "Announcement not saved, Please try again.";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
   }
 
 }//End of validating that the POST variables are not empty

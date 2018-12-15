@@ -27,13 +27,12 @@
 ?>
 <!DOCTYPE html>
 <head>
-<link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>Submit Assignment - Online Assignment Submission</title>
+<title>Submit Assignment - ASG</title>
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -45,29 +44,18 @@
 
 <body>
 
-<div class="jumbotron">
-      <div class="container" align="center">
-      <h1 align="center">Online Assignment Submission</h1>
-      <p align="center">Upload Assignment File</p>
-      </div>
- </div><!-- End of Main Jumbotron-->
-
- <nav class="navbar navbar-dark navbar-fixed-top bg-inverse">
-      <button type="button" class="navbar-toggler hidden-sm-up" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="student.php">Home</a>
-      <div id="navbar">
-        
-        <span class="pull-xs-right">
+<nav class="navbar navbar-light bg-dark">
+  <a class="navbar-brand" href="student.php">
+    <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+    <span style="color: white;">ASG System</span>
+  </a>
+  <span class="pull-xs-right" style="color: white;">
           <P>Welcome here, <?php echo $studentName; ?></P>
-        </span>
-      </div>
-    </nav>	
+  </span>
+</nav>
+
 <div class="container assDetails">
+	<div id="message" style="text-align: center; margin-top: 5px;"></div>
 <!-- This is the page where the student gets to upload the solution to a given assignment -->
 <?php	
 
@@ -141,7 +129,7 @@
 		?>
 		<!-- Form To upload the txt document-->
 		<form method="post" role="form" class="form-horizontal" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-			<input type="file" name="myfile">
+			<input type="file" name="myfile" required="">
 			<input type="hidden" name="subAssId" value="">
 			<input type="submit" name="submit" value="Upload" class="btn btn-primary">
 		</form>
@@ -266,22 +254,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			    $stmt->bind_param("ssssss",$assignmentId,$courseCode,$matricNum,$target_file,$status,$date);
 
 			    if($stmt->execute()){
-			      echo "Data Inserted Successfully";
-			      ?>
-			      <?php
+			      	?>
+				     <script>
+				      alert("Assignment Submitted successfully");
+				     window.location.href = 'student.php';
+				     </script>
+				     <?php
 			    }
 			    else{
-			      echo "Data not Successfully Inserted " . $stmt->error;
+			    	?>
+		      <script>
+		          document.getElementById("message").innerHTML = "Assignment not Submitted";
+		          document.getElementById("message").style.color = "red";
+		      </script>
+		      <?php
+			      // echo "Data not Successfully Inserted " . $stmt->error;
 			    }
 		    } 
 		    else {
-		        echo "Sorry, there was an error uploading your file.";
+		    	?>
+		      <script>
+		          document.getElementById("message").innerHTML = "Sorry, There was an error uploading your file.";
+		          document.getElementById("message").style.color = "red";
+		      </script>
+		      <?php
+		        // echo "Sorry, there was an error uploading your file.";
 		    }
 		}
-	}
-		
+	}	
 	}
 	else{
+		?>
+		      <script>
+		          document.getElementById("message").innerHTML = "Select File to upload.";
+		          document.getElementById("message").style.color = "red";
+		      </script>
+		      <?php
 		echo "Select File to upload";
 	}
 	
@@ -291,11 +299,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 </div>
 
-<div class="container-fluid col-sm-12">
-    <footer class="footer">
-         <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> OAS System </p>
-      </footer>
-</div>
+<!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid">
+          <div class="container my-auto">
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+            </div>
+          </div>
+        </footer>
+
 
 </body>

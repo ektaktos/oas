@@ -38,10 +38,11 @@ $resultStudent = $conn->query($queryStudent);
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Student - OAS</title>
+    <title>View Scores - ASG</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -62,9 +63,9 @@ $resultStudent = $conn->query($queryStudent);
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
       <a class="nav-brand mr-1" href="student.php" style="color: #ffffff;">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span >Dashboard</span>
-          </a>
+            <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+            <span style="color: white;">ASG System</span>
+      </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
@@ -211,14 +212,14 @@ $resultStudent = $conn->query($queryStudent);
     <!-- /#wrapper -->
 
      <!-- Sticky Footer -->
-        <footer class="sticky-footer">
+        <footer class="sticky-footer container-fluid">
           <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-              <span>Copyright © Your Website 2018</span>
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
             </div>
           </div>
         </footer>
-
+5
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
       <i class="fas fa-angle-up"></i>

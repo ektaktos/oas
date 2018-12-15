@@ -18,7 +18,7 @@ $course_array = json_decode($courses);
 $course_string = implode("','", $course_array);
 
  // Mysql Query to select all the Ungraded assignments from database
-$selectSubmAssignment = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='UnGraded'";
+$selectSubmAssignment = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='UnGraded' GROUP BY AssignmentId";
 $resultSubmAssignment = $conn->query($selectSubmAssignment); 
 
 // Mysql Query to select all the Graded assignments from database
@@ -49,10 +49,11 @@ $resultTutor = $conn->query($queryTutor);
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Tutor - OAS</title>
+    <title>Tutor - ASG</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -75,8 +76,8 @@ $resultTutor = $conn->query($queryTutor);
 <!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
 
           <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span >Dashboard</span>
+            <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+            <span style="color: white;">ASG System</span>
           </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -281,11 +282,11 @@ $resultTutor = $conn->query($queryTutor);
 
     </div>
     <!-- /#wrapper -->
-     <!-- Sticky Footer -->
-        <footer class="sticky-footer">
+    <!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid">
           <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-              <span>Copyright © Your Website 2018</span>
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
             </div>
           </div>
         </footer>

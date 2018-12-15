@@ -41,11 +41,12 @@ $link = "tutor.php";
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no
+    <link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Article Entry - OAS</title>
+    <title>Article Entry - ASG</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -63,8 +64,8 @@ $link = "tutor.php";
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
    
       <a class="nav-brand mr-1" href="<?php echo $link; ?>" style="color: #ffffff;">
-        <i class="fas fa-fw fa-tachometer-alt"></i>
-        <span >Dashboard</span>
+        <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+        <span style="color: white;">ASG System</span>
       </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -193,6 +194,7 @@ $link = "tutor.php";
       <div id="content-wrapper">
         <div class="container-fluid">
             <h3>Article Entry</h3>
+            <div id="message" style="text-align: center; margin-top: 5px;"></div>
         <!-- Ensuring only the tutor has access to upload article -->
         <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
           <div style="background-color: #343a40; padding: 10px 0px 0px 5px; border: 2px solid silver; border-radius: 5px; color: #FFF;" class="col-sm-10">
@@ -209,7 +211,7 @@ $link = "tutor.php";
               </div>
 
               <div style="margin: 10px 5px 10px 15px;">
-              <input type="submit" value="Submit" name="submit" class="btn btn-primary">
+              <input type="submit" value="Upload" name="submit" class="btn btn-primary">
               </div>            
             </form>
             </div>
@@ -265,7 +267,7 @@ $link = "tutor.php";
         <footer class="sticky-footer container-fluid">
           <div class="container my-auto">
             <div class="copyright my-auto">
-              <span>Copyright © Your Website 2018</span>
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
             </div>
           </div>
         </footer>
@@ -337,29 +339,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $uploadedDate = date("Y-m-d h:i:sa");
       $target_dir = "articles/";
       $target_file = $target_dir . basename($_FILES["articleFile"]["name"]);
+      $visible = 1;
 
       // Checking if the article exists in record already
       $selectArticle = "SELECT* FROM article WHERE articleName='$name' AND articlePath='$target_file'";
       $resultArticle = $conn->query($selectArticle);
       $num = $resultArticle->num_rows;
       if ($num >=1 ) {
-        echo "Sorry Article Exists already";
+        ?>
+    <script>
+        document.getElementById("message").innerHTML = "Sorry, Article exists already";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
         return;
       }
       
       move_uploaded_file($_FILES["articleFile"]["tmp_name"], $target_file);
       // Inserting the new article to database
       $stmt = $conn->prepare("INSERT INTO article(articleName,articlePath,tutorName,uploadedDate,visible) value (?,?,?,?,?)");
-      $stmt->bind_param('sssss',$name,$target_file,$tutorName,$uploadedDate,'1');
+      $stmt->bind_param('sssss',$name,$target_file,$Name,$uploadedDate,$visible);
       if($stmt->execute()){
-      echo "Data Inserted Successfully";
+       ?>
+     <script>
+      alert("Article saved successfully");
+     window.location.href = 'articleEntry.php'
+     </script>
+     <?php
       }
       else{
-      echo "Data not Successfully Inserted " . $stmt->error;
+      ?>
+    <script>
+        document.getElementById("message").innerHTML = "Article not saved, Please try again.";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
       }
     }
     else{
-          echo "Sorry, Fill all fields";
+        ?>
+    <script>
+        document.getElementById("message").innerHTML = "Sorry, Fill in all fields.";
+        document.getElementById("message").style.color = "red";
+    </script>
+    <?php
     } 
 }
 

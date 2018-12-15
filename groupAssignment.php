@@ -38,13 +38,12 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 <!DOCTYPE html>
 <head>
-<link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>New Assignment-Online Assignment Submission</title>
+<title>New Assignment - ASG</title>
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -57,8 +56,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
          <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span >Dashboard</span>
+            <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
+            <span style="color: white;">ASG System</span>
           </a>
 
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -155,6 +154,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
      
     <div class="offset-md-2 col-md-8">
     <h3 align="center" class="display-5">New Assignment</h3>
+    <div id="message" style="text-align: center; margin-top:10px;"></div>
 
   <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data" onsubmit= "return validate(this)">
 
@@ -219,12 +219,15 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 </div>
 </div>
 
-<div class="container-fluid col-sm-12">
-    <footer class="footer">
-         <hr>
-       <p align="center">&copy; <?php echo Date("Y");?> Alphatim Inc. </p>
-      </footer>
-</div>
+<!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid">
+          <div class="container my-auto">
+            <div class="copyright my-auto">
+              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+            </div>
+          </div>
+        </footer>
+
 
 </body> 
 
@@ -270,10 +273,21 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
     $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
     if($stmt->execute()){
-      echo "Data Inserted Successfully";
+       ?>
+     <script>
+      alert("Group Assignment saved successfully");
+     window.location.href = 'groupAssignment.php';
+     </script>
+     <?php
     }
     else{
-      echo "Data not Successfully Inserted " . $stmt->error;
+      ?>
+          <script>
+              document.getElementById("message").innerHTML = "Group Assignment not saved.";
+              document.getElementById("message").style.color = "red";
+          </script>
+          <?php
+      // echo "Data not Successfully Inserted " . $stmt->error;
     }
 
   }
