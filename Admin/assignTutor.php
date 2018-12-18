@@ -81,7 +81,7 @@ else
         		else{
 	        	while ($row = $resultCourse->fetch_assoc())
 			    {
-			         echo '<option value="'.$row['courseCode'].'">'.$row['courseName'].' ('.$row['courseCode'].')</option>'; 
+			         echo '<option value="'.$row['courseCode'].'">'.$row['courseName'].' ('.str_replace('_',' ',$row['courseCode']).')</option>'; 
 			    } 
 			    }
         	?>
