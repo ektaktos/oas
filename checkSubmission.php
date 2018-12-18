@@ -84,7 +84,7 @@ $resultTutor = $conn->query($queryTutor);
 
       <!-- Navbar Dispaly Search bar and User Name -->
       
-      <form class="d-none d-md-inline-block form-inline ml-auto ">
+      <form class="d-none d-md-inline-block form-inline ml-auto" method="post" action="searchStudent.php">
           <input type="text" name="matricNum" class="form-control" placeholder="Enter Matric Number">
           <input type="submit" value="Search" name="submit" class="btn">
       </form>

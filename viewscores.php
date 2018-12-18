@@ -9,14 +9,15 @@ require_once 'Admin/connect.php';
 $matricNum = $_SESSION['oas_studmatricNum'];
 
 // Selecting the courses a student has registered for.
-$query = "SELECT* FROM assignmentsubmission WHERE matricNum = '$matricNum'";
+$query = "SELECT* FROM assignmentsubmission WHERE matricNum = '$matricNum' GROUP BY AssignmentId";
 $result = $conn->query($query);
 
-$queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
+$queryStudent = "SELECT Name,current_semester FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
 
  while ($row = $resultStudent->fetch_assoc()) {
         $studentName = $row['Name'];
+        $cur_level = $row['current_semester'];
     }
 
 
@@ -76,6 +77,8 @@ $resultStudent = $conn->query($queryStudent);
         <span class="">
         </span>
       </form>
+
+      <h5 align="center" style="color: #FFF;">Current Level (<?=$cur_level;?> Level)</h5>
 
       <!-- Navbar -->
       <ul class="navbar-nav ml-auto ml-md-0">
@@ -172,7 +175,7 @@ $resultStudent = $conn->query($queryStudent);
 
                       if (strpos($assignmentId, '_') !== false) {
                         $arr = explode('_', $assignmentId);
-                        $assId = $arr[0];
+                        $assId = $arr[1];
                        }else{
                         $assId = $assignmentId;
                        }

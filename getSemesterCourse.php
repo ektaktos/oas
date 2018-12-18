@@ -54,6 +54,7 @@ require_once "Admin/connect.php";
     echo "<td>".$row['courseName']."</td>";
     echo "<td>".$row['unit']."</td>";
     echo "<td><input type='checkbox' name='courses[]' value='".$row['courseCode']."'></td>";
+    echo "<td><input type='hidden' name='level' value='".$row['level']."'></td>";
     echo "</tr>";
     
   }

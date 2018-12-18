@@ -19,9 +19,6 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
     $resultTutor = $conn->query($queryTutor);
 
-    $queryScoresheet = "SELECT* FROM assignmentresult";
-    $resultScoresheet = $conn->query($queryScoresheet);
-
     while ($row = $resultTutor->fetch_assoc()) {
         $tutorName = $row['Name'];
     }
@@ -74,7 +71,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
       <!-- Navbar Dispaly Search bar and User Name -->
       
-      <form class="d-none d-md-inline-block form-inline ml-auto ">
+     <form class="d-none d-md-inline-block form-inline ml-auto" method="post" action="searchStudent.php">
           <input type="text" name="matricNum" class="form-control" placeholder="Enter Matric Number">
           <input type="submit" value="Search" name="submit" class="btn">
       </form>
@@ -158,7 +155,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
      <div id="content-wrapper">
       <div class="container-fluid">
-        <div style="margin-top: 40px;" class="offset-sm-2 col-sm-6">
+        <div style="margin-top: 40px; margin-bottom: 30px;" class="offset-sm-2 col-sm-6">
         <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
           <div class="form-group">
             <input type="text" name="matricNum" class="form-control" placeholder="Enter Matric Number">
@@ -175,7 +172,6 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
               if(!empty($_POST['matricNum'])){ 
 
               $matricNum = $_POST['matricNum'];
-
               $querySearch = "SELECT* FROM assignmentresult WHERE matricNum = '$matricNum'";
               $resultSearch = $conn->query($querySearch);
               $rownum = $resultSearch->num_rows;
@@ -191,17 +187,19 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
                       <th>Name</th>
                       <th>Matric. No</th>
                       <th>Course Code</th>
-                      <th>Assignment ID</th>
-                      <th>Score</th>
+                      <th>Assignment 1</th>
+                      <th>Assignment 2</th>
+                      <th>Assignment 3</th>
+                      <th>Assignment 4</th>
+                      <th>Assignment 5</th>
                     </tr>
                   
       <?php
         //php block of code to display the selected data from database
         $i = 1;
-        while ($row = $resultScoresheet->fetch_assoc()) {
+        while ($row = $resultSearch->fetch_assoc()) {
 
           $matricNum = $row['matricNum'];
-
           //Mysql Query to select the name of the corresponding matric number from database
           $queryStudent = "SELECT Name FROM student WHERE matricNum = '$matricNum'";
           $resultStudent = $conn->query($queryStudent); 
@@ -215,8 +213,11 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           echo "<td>". $studentName."</td>";
           echo "<td>". $matricNum."</td>";
           echo "<td>". str_replace('_',' ',$row['courseCode'])."</td>";
-          echo "<td>". $row['assignmentId']."</td>";
-          echo "<td>".$row['score']."</td>";
+          echo "<td>". $row['Ass01']."</td>";
+          echo "<td>". $row['Ass02']."</td>";
+          echo "<td>". $row['Ass03']."</td>";
+          echo "<td>". $row['Ass04']."</td>";
+          echo "<td>". $row['Ass05']."</td>";
           echo "</tr>";
 
         $i++;

@@ -24,14 +24,13 @@ $querySelectCourse = "SELECT courseCode FROM course";
 $resultSelectCourse = $conn->query($querySelectCourse);
 
 
-$queryStudent = "SELECT Name FROM student WHERE MatricNum = '$matricNum'";
+$queryStudent = "SELECT Name,current_semester FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
 
  while ($row = $resultStudent->fetch_assoc()) {
         $studentName = $row['Name'];
+        $cur_level = $row['current_semester'];
     }
-
-
  }
 
  else{
@@ -86,6 +85,8 @@ $resultStudent = $conn->query($queryStudent);
         <span class="">
         </span>
       </form>
+
+      <h5 align="center" style="color: #FFF;">Current Level (<?=$cur_level;?> Level)</h5>
 
       <!-- Navbar -->
       <ul class="navbar-nav ml-auto ml-md-0">
@@ -145,7 +146,7 @@ $resultStudent = $conn->query($queryStudent);
 
           <div id="message" style="text-align: center; margin-top: 5px;"></div>
 
-          <h2 align="center">Current Level (100 Level)</h2>
+          <p>Select your current semester below to register courses for the semester.</p>
           <div>
             <select class="form-group" id="semester">
               <option value=""> Choose Semester</option>
@@ -175,26 +176,20 @@ $resultStudent = $conn->query($queryStudent);
                   <input type="Submit" name="submit" value="Submit" class="btn btn-primary">
               </div> 
           </form>       
-          
-
         </div>
         <!-- /.container-fluid -->
-
-     <!-- Sticky Footer -->
-        <footer class="sticky-footer container-fluid">
+      </div>
+      <!-- /.content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+    <!-- Sticky Footer -->
+        <footer class="sticky-footer container-fluid" style="margin-bottom:20px;">
           <div class="container my-auto">
-            <div class="copyright my-auto">
+            <div class="copyright my-auto" style="text-align: center;">
               <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
             </div>
           </div>
         </footer>
-
-
-      </div>
-      <!-- /.content-wrapper -->
-
-    </div>
-    <!-- /#wrapper -->
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
@@ -245,7 +240,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if (!empty($_POST['courses'])) {
   $course = $_POST['courses'];
+  $level = $_POST['level'];
   $courses_json = json_encode($course);
+  echo " ". $courses_json . $matricNum;
 
   // Checking if the course exists in database already
   $querySelect = "SELECT courses FROM student WHERE MatricNum = '$matricNum'";
@@ -254,14 +251,14 @@ if (!empty($_POST['courses'])) {
 
     // What to perform if course does not exist in database yet.
     // Code to Insert the details of the new admin to database
-    $updateQuery = "UPDATE student SET courses AS $courses_json WHERE MatricNum = '$matricNum'";
-    $resultUpdate = query($updateQuery);
+    $updateQuery = "UPDATE student SET courses = '$courses_json' AND current_semester = '$level' WHERE MatricNum = '$matricNum'";
+    $resultUpdate = $conn->query($updateQuery);
 
-    if($stmt->execute()){
+    if($resultUpdate){
        ?>
      <script>
-      alert("Course saved successfully");
-     window.location.href = 'newAssignment.php';
+      alert("Courses saved successfully");
+     window.location.href = 'student.php';
      </script>
      <?php
     }
@@ -272,7 +269,7 @@ if (!empty($_POST['courses'])) {
           document.getElementById("message").style.color = "red";
       </script>
       <?php
-      // echo "Data not Successfully Inserted" . $stmt->error;
+      // echo "Data not Successfully Inserted";
     }
 }//End of validating that the POST variables are not empty
 else{

@@ -106,8 +106,6 @@
 		}
 		echo "<tr><td><strong>Assignment Id:</strong></td><td> " . $assignmentId ."</td></tr>";
 		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
-		echo "<tr><td><strong>Tutor Email:</strong></td><td> " . $tutorEmail ."</td></tr>";
-		echo "<tr><td><strong>Tutor Phone:</strong></td><td> " . $tutorPhone ."</td></tr>";
 		echo "<tr><td><strong>Course Code:</strong></td><td> " . str_replace('_',' ',$courseCode)."</td></tr>";
 		echo "<tr><td><strong>Date Assigned:</strong></td><td> " . $dateAssigned ."</td></tr>";
 		echo "<tr><td><strong>Submission Date:</strong></td><td> " . $deadlineDate ."</td></tr>";
@@ -140,8 +138,6 @@
 		echo "<table class='table table-bordered'>";
 		echo "<tr><td><strong>Assignment Id:</strong></td><td> " . $assignmentId ."</td></tr>";
 		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
-		echo "<tr><td><strong>Tutor Email:</strong></td><td> " . $tutorEmail ."</td></tr>";
-		echo "<tr><td><strong>Tutor Phone:</strong></td><td> " . $tutorPhone ."</td></tr>";
 		echo "<tr><td><strong>Course Code:</strong></td><td> " . str_replace('_',' ',$courseCode)."</td></tr>";
 		echo "<tr><td><strong>Date Assigned:</strong></td><td> " . $dateAssigned ."</td></tr>";
 		echo "<tr><td><strong>Submission Date:</strong></td><td> " . $deadlineDate ."</td></tr>";
