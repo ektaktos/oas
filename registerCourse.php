@@ -17,7 +17,11 @@ while ($row = $resultCourses->fetch_assoc()) {
 }
 $course_array = json_decode($courses);
 
-$course_string = implode("','", $course_array);
+if (!empty($course_array)) {
+  $course_string = implode("','", $course_array);
+}else{
+  $course_string = ''; 
+}
 
 // Selecting all the available courses from database
 $querySelectCourse = "SELECT courseCode FROM course";  
@@ -145,7 +149,15 @@ $resultStudent = $conn->query($queryStudent);
         <div class="container-fluid">
 
           <div id="message" style="text-align: center; margin-top: 5px;"></div>
-
+          <?php if (!empty($course_string)) { ?>
+          <div style="text-align: center; margin-bottom: 20px; font-size: 18px;">
+            <span><b>Registered Courses:</b> </span><?=str_replace('_',' ', $course_string)?>.
+          </div>
+          <?php }else{?>
+            <div style="text-align: center; margin-bottom: 20px; font-size: 18px;">
+            <span><b>Registered Courses:</b> </span> No Course registered yet.
+          </div>
+          <?php }?>
           <p>Select your current semester below to register courses for the semester.</p>
           <div>
             <select class="form-group" id="semester">
@@ -242,18 +254,13 @@ if (!empty($_POST['courses'])) {
   $course = $_POST['courses'];
   $level = $_POST['level'];
   $courses_json = json_encode($course);
-  echo " ". $courses_json . $matricNum;
-
-  // Checking if the course exists in database already
-  $querySelect = "SELECT courses FROM student WHERE MatricNum = '$matricNum'";
-  $resultSelect = $conn->query($querySelect);
-  $rowNum = $resultSelect->num_rows;
+  echo " ". $courses_json . $matricNum . $level;
 
     // What to perform if course does not exist in database yet.
     // Code to Insert the details of the new admin to database
-    $updateQuery = "UPDATE student SET courses = '$courses_json' AND current_semester = '$level' WHERE MatricNum = '$matricNum'";
+    $updateQuery = "UPDATE student SET courses = '$courses_json', current_semester = '$level' WHERE MatricNum = '$matricNum'";
     $resultUpdate = $conn->query($updateQuery);
-
+    echo $courses_json .  $level;
     if($resultUpdate){
        ?>
      <script>

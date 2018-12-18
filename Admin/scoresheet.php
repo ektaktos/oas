@@ -3,27 +3,28 @@
 session_start();
 require_once "Admin/connect.php";
 if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
+ 	# What to perform if the tutor is really logged in
+  $startdate = strtotime("today");
+	$enddate = strtotime("+1 year",$startdate);
+
+	$newstart =  date("Y", $startdate);
+	$newend =  date("Y",$enddate);
  
     $tutorId = $_SESSION['oas_tutorId'];
-    // Selecting the courses offered by tutor.
-    $queryCourses = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
-    $resultCourses = $conn->query($queryCourses);
-    while ($row = $resultCourses->fetch_assoc()) {
-        $courses = $row['courses'];
-    }
-    $course_array = json_decode($courses);
-    $course_string = implode("','", $course_array);
+    // Selecting the courses offered by the current tutor from database
+    $querySelect = "SELECT courses FROM tutor WHERE StaffId = '$tutorId'";
+    $resultSelect = $conn->query($querySelect);
 
     $queryTutor = "SELECT Name FROM tutor WHERE StaffId = '$tutorId'";
     $resultTutor = $conn->query($queryTutor);
 
+    $queryScoresheet = "SELECT* FROM assignmentresult";
+    $resultScoresheet = $conn->query($queryScoresheet);
+
     while ($row = $resultTutor->fetch_assoc()) {
         $tutorName = $row['Name'];
     }
-
-    // Selecting the groups available for each course
-    $queryGroups = "SELECT* FROM group_members WHERE courseCode IN ('$course_string')";
-    $resultGroups = $conn->query($queryGroups);
+    
  }
 
  else{
@@ -37,25 +38,27 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 <!DOCTYPE html>
 <head>
-<link rel="shortcut icon" href="image/alphatim.png" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link href="Admin/dashboard/image/logo.gif" rel="shortcut icon"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
-<title>Create Group - ASG</title>
+<title>Scoresheet - ASG</title>
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom fonts for this template-->
     <link href="Admin/dashboard/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Custom styles for this template-->
+   <!-- Custom styles for this template-->
     <link href="Admin/dashboard/css/sb-admin.css" rel="stylesheet">
-<body>
- <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-         <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+<!--       <a class="navbar-brand mr-1" href="tutor.php">Home</a>--> 
+
+          <a class="nav-brand mr-1" href="tutor.php" style="color: #ffffff;">
             <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
             <span style="color: white;">ASG System</span>
           </a>
@@ -92,7 +95,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
         
-        <li class="nav-item">
+        <li class="nav-item active">
             <a href="scoresheet.php" class="nav-link">
               <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Scoresheet</span>
@@ -113,8 +116,8 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
           </a>
         </li>
 
-        <li class="nav-item active">
-          <a class="nav-link" href="#">
+        <li class="nav-item">
+          <a class="nav-link" href="creategroup.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Create Group</span>
           </a>
@@ -147,74 +150,63 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
             <span>Announcement</span>
           </a>
         </li>
+      </ul>
 
-    </ul>
+      <div id="content-wrapper">
+      <div class="container-fluid" align="center">
+          <table width="auto" class="table table-hover table-responsive" align="center">
+                  <tr>
+                    <th>Sn.</th>
+                    <th>Name</th>
+                    <th>Matric. No</th>
+                    <th>Course Code</th>
+                    <th>Ass. 1</th>
+                    <th>Ass. 2</th>
+                    <th>Ass. 3</th>
+                    <th>Ass. 4</th>
+                    <th>Ass. 5</th>
+                    <th>Average</th>
+                  </tr>
+                
+            <?php
+              //php block of code to display the selected data from database
+              $i = 1;
+              while ($row = $resultScoresheet->fetch_assoc()) {
 
-  <div id="content-wrapper">
-     
-    <div class="offset-md-2 col-md-8">
-    <h3 align="center" class="display-5">Create New Group</h3>
-    <div id="message" style="text-align: center; margin-top: 5px;"></div>
-    <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data" onsubmit= "return validate(this)">
-    <div class="form-group">
-      <select class="form-control" name="courseCode" id="courseCode" required>
-        <option value="">--Select Course Code--</option>
-        <?php
-         foreach ($course_array as $course) {
-           echo "<option value = ".$course."> ".str_replace('_',' ',$course)."</option>";
-         }
-        ?>
-      </select>
-    </div>
+                $matricNum = $row['matricNum'];
 
-    <div class="form-group" id="students" required>
-      
-    </div>
+                //Mysql Query to select the name of the corresponding matric number from database
+                $queryStudent = "SELECT Name FROM student WHERE matricNum = '$matricNum'";
+                $resultStudent = $conn->query($queryStudent); 
 
-    <div class="form-group">
-      <input type="text" name="groupName" placeholder="Enter Group Name" class="form-control" required>
-    </div>
+                while ($rowname = $resultStudent->fetch_assoc()) {
+                    $studentName = $rowname['Name'];
+                }
+                $ass1 = $row['Ass01']; $ass2 = $row['Ass02']; $ass3 = $row['Ass03'];
+                $ass4 = $row['Ass04']; $ass5 = $row['Ass05'];
+                $average = ($ass1 + $ass2 + $ass3 + $ass4 + $ass5)/5;
+                echo "<tr>";
+                echo '<td>'.$i.'</td>';
+                echo "<td>". $studentName."</td>";
+                echo "<td>". $matricNum."</td>";
+                echo "<td>".str_replace('_',' ',$row['courseCode'])."</td>";
+                echo "<td>". $ass1 ."</td>";
+                echo "<td>". $ass2."</td>";
+                echo "<td>". $ass3."</td>";
+                echo "<td>". $ass4."</td>";
+                echo "<td>". $ass5."</td>";
+                echo "<td>". $average."</td>";
+                echo "</tr>";
 
-    <div class="form-group">
-      <input type="submit" name="submit" value="Create Group" class="btn btn-primary">
-    </div>
-   </form>
+              $i++;
 
-   <table class="table table-striped">
-     <thead>
-       <tr>
-         <th>Sn</th>
-         <th>Group Name</th>
-         <th>Course Code</th>
-         <th>Group Members</th>
-       </tr>
-     </thead>
-     <tbody>
-       <?php
-       $sn = 1;
-       if ($resultGroups->num_rows < 1) {
-        echo"<tr align='center'>";
-        echo "<td colspan='4'> No Group Records Available </td>";
-        echo "</tr>";
-       }
-       else{
-        while ($row = $resultGroups->fetch_assoc()) {
-          echo "<tr>";
-          echo "<td>".$sn."";
-          echo "<td>".$row['group_name']."";
-          echo "<td>".$row['courseCode']."";
-          echo "<td>".$row['members']."";
-          echo "</tr>";
-          $sn+=1;
-        }
-       }
-       ?>
-     </tbody>
-   </table>
+              }//End of Php Block of code to display the selected data from database 
 
-  </div>
-  </div>
-  </div>
+    ?>
+    </table>
+</div>
+</div>
+</div>
 
 <!-- Sticky Footer -->
         <footer class="sticky-footer container-fluid">
@@ -227,40 +219,6 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 
 </body> 
-
-<?php
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (!empty($_POST['courseCode']) && !empty($_POST['groupName']) && !empty($_POST['students'])) {
-        $courseCode = $_POST['courseCode'];
-        $groupName = $_POST['groupName'];
-        $members = json_encode($_POST['students'],JSON_UNESCAPED_SLASHES);
-       
-    }	
-
-    $stmt = $conn->prepare("INSERT INTO group_members(group_name,courseCode,members) VALUES (?,?,?)");
-      $stmt->bind_param("sss",$groupName,$courseCode,$members);
-      if($stmt->execute()){
-         ?>
-     <script>
-      alert("Group created successfully");
-     window.location.href = 'creategroup.php'
-     </script>
-     <?php
-      }
-      else{
-       ?>
-          <script>
-              document.getElementById("message").innerHTML = "Sorry, group not created, try again.";
-              document.getElementById("message").style.color = "red";
-          </script>
-          <?php
-      }
-
-}
-
-
-?>
 
 <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
@@ -290,19 +248,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="Admin/dashboard/vendor/jquery/jquery.min.js"></script>
     <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom scripts for all pages-->
-<!--     <script src="Admin/dashboard/js/sb-admin.js"></script> -->
-    <script type="text/javascript">
-      $(document).ready(function() {
-    
-      $('#courseCode').unbind('change');
-      $('#courseCode').change(function() {
-        console.log('Hello');
-      var courseCode = $('#courseCode').val();
-      // $("#assTable").load('getSubmissions.php',{"courseCode":courseCode,"assId":assId,})
-      $("#students").load('getStudentByCourse.php',{"courseCode":courseCode,})
-      });
+    <!-- Core plugin JavaScript-->
+    <script src="Admin/dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
 
-      });
-    </script>
+    <!-- Page level plugin JavaScript-->
+    <script src="Admin/dashboard/vendor/chart.js/Chart.min.js"></script>
+    <script src="Admin/dashboard/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="Admin/dashboard/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="Admin/dashboard/js/sb-admin.min.js"></script>
+
+    <!-- Demo scripts for this page-->
+    <script src="Admin/dashboard/js/demo/datatables-demo.js"></script>
+    <script src="Admin/dashboard/js/demo/chart-area-demo.js"></script>
 

@@ -16,8 +16,11 @@ while ($row = $resultCourses->fetch_assoc()) {
     $courses = $row['courses'];
 }
 $course_array = json_decode($courses);
-
-$course_string = implode("','", $course_array);
+if (!empty($course_array)) {
+  $course_string = implode("','", $course_array);
+}else{
+  $course_string = ''; 
+}
 
 // Mysql Query to select all the available announcements based on tutorid
 $selectAnnouncement = "SELECT* FROM announcement WHERE visible = '1' ORDER BY sn desc LIMIT 0,2";

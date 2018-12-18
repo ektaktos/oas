@@ -149,7 +149,7 @@ if (!empty($_POST['tutorName']) && !empty($_POST['tutorId']) && !empty($_POST['t
   // Checking if the tutor exists in database already
   $querySelect = "SELECT* FROM tutor WHERE Name = '$tutorName' AND StaffId ='$tutorId'";
   $resultSelect = $conn->query($querySelect);
-  $rowNum = $result->num_rows;
+  $rowNum = $resultSelect->num_rows;
 
   if ($rowNum < 1) {
     // What to perform if tutor does not exist in database yet.

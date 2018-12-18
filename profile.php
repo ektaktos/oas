@@ -55,7 +55,7 @@ $rownum = $resultTutor->num_rows;
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Article Entry - ASG</title>
+    <title>Profile - ASG</title>
 
     <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -196,7 +196,9 @@ $rownum = $resultTutor->num_rows;
               echo "<tr><td>Identification Number: </td><td>" . $id ."</td></tr>";
               echo "<tr><td>Phone: </td><td>" . $phone ."</td></tr>";
               echo "<tr><td>Email: </td><td>" . $email ."</td></tr>";
-              $course = implode(",", json_decode($courses));
+              if (!empty($courses)) {
+                $course = implode(",", json_decode($courses));
+              }
               echo "<tr><td>Courses: </td><td>" . $course ."</td></tr>";
 
           }
