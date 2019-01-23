@@ -15,7 +15,6 @@ $rownum = $resultStudent->num_rows;
         $Name = $row['Name'];
         $phone = $row['phone'];
         $email = $row['email'];
-        $courses = str_replace('_',' ', $row['courses']);
     }
  }
 
@@ -32,7 +31,6 @@ $rownum = $resultTutor->num_rows;
         $Name = $row['Name'];
         $phone = $row['phone'];
         $email = $row['email'];
-        $courses = $row['courses'];
     }
  }
 
@@ -69,157 +67,23 @@ $rownum = $resultTutor->num_rows;
   </head>
 
   <body id="page-top">
+<!-- Navigation Bar-->
+    <?php include 'navbar.php'; ?>
 
-    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-   
-      <a class="nav-brand mr-1" href="<?php echo $link; ?>" style="color: #ffffff;">
-        <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
-        <span style="color: white;">ASG System</span>
-      </a>
-
-      <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-        <i class="fas fa-bars"></i>
-      </button>
-
-
-      <!-- Navbar Dispaly Search bar and User Name -->
-      
-       <?php if (!empty($_SESSION['oas_tutorId'])) { ?>  
-      <form class="d-none d-md-inline-block form-inline ml-auto" method="post" action="searchStudent.php">
-          <input type="text" name="matricNum" class="form-control" placeholder="Enter Matric Number">
-          <input type="submit" value="Search" name="submit" class="btn">
-      </form>
-    <?php } ?>
-      <!-- Navbar -->
-      <ul class="navbar-nav ml-auto ml-md-0">
-        
-        <li class="nav-item dropdown no-arrow">
-          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-user-circle fa-fw"></i><?php echo $Name;?>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
-            <a class="dropdown-item" href="#">Profile</a>
-          </div>
-        </li>
-      </ul>
-
-    </nav>
-
-    <div id="wrapper">
+<div id="wrapper">
 
       <!-- Sidebar -->
-      <ul class="sidebar navbar-nav">
-      <?php if (!empty($_SESSION['oas_tutorId'])) { ?>
-        <li class="nav-item">
-            <a href="scoresheet.php" class="nav-link">
-              <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Scoresheet</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="searchStudent.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Search Student</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="checkSubmission.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Check Submission</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="newAssignment.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>New Assignment</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="newAssignment.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>New Group Assignment</span>
-          </a>
-        </li>
-
-        <li class="nav-item active">
-          <a class="nav-link" href="articleEntry.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Article Entry</span>
-          </a>
-        </li>
-
-         <li class="nav-item">
-          <a class="nav-link" href="announcement.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Announcement</span>
-          </a>
-        </li>
-        
-      <?php } elseif(!empty($_SESSION['oas_studmatricNum'])){?>
-
-        <li class="nav-item">
-          <a class="nav-link" href="registerCourse.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Register Course</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="viewscores.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>View Scores</span>
-          </a>
-        </li>
-
-       <li class="nav-item active">
-          <a class="nav-link" href="articleEntry.php">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Article Entry</span>
-          </a>
-        </li>
-        <?php } ?>
-
-      </ul>
-
-
-    <div class="container-fluid">
-        <table class="table" style="width: 70%; margin: 50px 0px 0px 50px">
-        <?php
-          if ($rownum >0) {
-              echo "<tr><td>Full Name: </td><td>" . $Name ."</td></tr>";
-              echo "<tr><td>Identification Number: </td><td>" . $id ."</td></tr>";
-              echo "<tr><td>Phone: </td><td>" . $phone ."</td></tr>";
-              echo "<tr><td>Email: </td><td>" . $email ."</td></tr>";
-              if (!empty($courses)) {
-                $course = implode(",", json_decode($courses));
-              }
-              echo "<tr><td>Courses: </td><td>" . $course ."</td></tr>";
-
-          }
-          else{
-            echo "Profile not available";
-          }
-        ?>
-
-        </table>
-
-
-    </div>
+	<?php include 'sidebar.php'; ?>
+  
+	<!-- Profile Editor -->
+	<?php include 'edit-profile.php'; ?> 
 </div>
     <!-- Sticky Footer -->
-        <footer class="sticky-footer container-fluid">
-          <div class="container my-auto">
-            <div class="copyright my-auto">
-              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+        <nav class="navbar navbar-dark bg-dark nav-fixed-bottom">
+            <div class = "container-fluid">
+                <label class="navbar-text pull-left">Assignment Submission & Grading System &copy; All rights reserved 2018</label>
             </div>
-          </div>
-        </footer>
+        </nav>
 
 
      <!-- Scroll to Top Button-->
@@ -228,23 +92,7 @@ $rownum = $resultTutor->num_rows;
     </a>
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="logout.php">Logout</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <?php include 'logoutmodal.php'; ?>  
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

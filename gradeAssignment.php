@@ -466,7 +466,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // What to perform if the submitted assignment is a group assignment
     elseif (isset($_POST['groupAssignment'])) {
       // Select the matric number of students in the group that submitted the assignment
-      $selectGroup = "SELECT members FROM group_members WHERE group_name ='$matricNum'"; 
+      $selectGroup = "SELECT members FROM group_members WHERE groupId ='$matricNum'"; 
       $resultGroup = $conn->query($selectGroup);
       while ($row = $resultGroup->fetch_assoc()) {
         $members = $row['members'];

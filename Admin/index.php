@@ -27,7 +27,7 @@ $user = $pass = $passwrd = $usrname = $paswrd = $position = "";
 // if user is already logged in
 if(!empty($_SESSION['oas_adminuser']))
 {
-	header("Location:newCourse.php");
+	header("Location:../cordinator/addCourse.php");
 	exit();
 }
 
@@ -36,65 +36,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // if both username and password are entered
 if(!empty($_POST['oas_adminuser']) && !empty($_POST['oas_adminpword']))
 {
- $user = fix_string($_POST['oas_adminuser']);
- $pass = fix_string($_POST['oas_adminpword']);
+ $user = $_POST['oas_adminuser'];
+ $pass = $_POST['oas_adminpword'];
 
-// // Hash encryption for protecting password in the database
-// $salt1 = "qm&h*";
-// $salt2 = "pg!@";
-// $passwrd = hash('ripemd128', "$salt1$pass$salt2");
+//Hash encryption for protecting password in the database
+$salt1 = "qm&h*";
+$salt2 = "pg!@";
+$passwrd = hash('ripemd128', "$salt1$pass$salt2");
 
-// require_once "connect.php";
+require_once "connect.php";
 
-// $query = "SELECT* FROM admin WHERE username = '$user' AND password = '$passwrd' ";
-// $result = $conn->query($query);
+$query = "SELECT * FROM admin WHERE username = '$user' AND password = '$passwrd' ";
+$result = $conn->query($query);
 
-// 		while( $row = $result->fetch_assoc())
-// 		{ 
-// 		$position = $row['position'];
-// 		}
-
-// 		if($result->num_rows < 1)
-// 		{
-// 	?>
-<!-- 	<div class="alert-danger">
-     <span class="closebtn" onclick="this.parentElement.style.display='none';" onload="this.parentElement.style.display='none';">&times;</span> 
-     Incorrect Username or Password
-     </div> -->
-     <?php
-// 		}
-
-// 		else{
-
-     	$position = "Administrator";
-		 //Creating sessions and cookies
-		 $_SESSION['oas_adminuser']=$user;
-		 $_SESSION['oas_adminpos']=$position;
-
-		header("Location:newCourse.php");
-		// }
-}// End of condition if both username and password are entered.
-
+if(mysqli_num_rows($result) == 1){
+  $_SESSION['oas_adminuser'] = $user;
+  header('Location:../cordinator/addCourse.php');
+}
 else{
-
-	?>
-	<div class="alert-danger">
-    <span class="closebtn" onclick="location.reload();" onload="this.parentElement.style.display='none';">&times;</span> 
-    Please enter the username and password
-    </div>
-    <?php
+  header('Location:index.php');
 }
-
-}#End of validating that the request sent is a POST method
-
-function fix_string($string)
-{
-if (get_magic_quotes_gpc()) $string = stripslashes($string);
-return htmlentities ($string);
 }
-
-
+}
 ?>
+
+
+
 <!-- Div container to contain the page -->
  <div class="container">
 

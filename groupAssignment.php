@@ -25,6 +25,10 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
     while ($row = $resultTutor->fetch_assoc()) {
         $tutorName = $row['Name'];
     }
+
+    // Query to get the List of group names
+    $selectGroups = "SELECT group_name FROM group_members WHERE courseCode = '$courseCode'";
+    $resultGroups = $conn->query($selectGroups);
  }
 
  else{
@@ -180,6 +184,15 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         ?>
       </select>
     </div>
+    <label>**Select the Group Name to assign different assignments to different gropus or leave empty for general assignments</label>
+    <select name="groupId">
+      <option value=''>--Select Group Name--</option>
+      <?php
+      while ($row = $resultGroups->fetch_assoc()) {
+        echo "<option value=".$row['members'].">".$row['group_name']."</option>";
+      }
+      ?>
+    </select>
 
     <div class="form-group">
       <select class="form-control" name="assignmentId">
@@ -254,42 +267,79 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       move_uploaded_file($_FILES["questionfile"]["tmp_name"], $question);
       $score = $_POST['score'];
       $type = 'single';
-
-      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
-    if($stmt->execute()){
-      echo "Data Inserted Successfully";
-    }
-    else{
-      echo "Data not Successfully Inserted " . $stmt->error;
-    }
-
+      // If the group assignment is peculiar to a group
+      if (!empty($_POST['groupId'])) {
+         $groupMembers = $_POST['groupId'];
+         $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,groupmembers,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("sssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$groupMembers,$assignedDay,$submission,$score);
+        if($stmt->execute()){
+           ?><script>
+          alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
+           </script><?php
+        }
+        else{
+          ?><script>
+                document.getElementById("message").innerHTML = "Group Assignment not saved.";
+                document.getElementById("message").style.color = "red";
+            </script><?php
+          // echo "Data not Successfully Inserted " . $stmt->error;
+        }
+      }
+      else{
+        $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+        if($stmt->execute()){
+         ?><script>
+        alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
+       </script><?php
+      }
+      else{
+        ?><script>
+              document.getElementById("message").innerHTML = "Group Assignment not saved.";
+              document.getElementById("message").style.color = "red";
+          </script> <?php
+        // echo "Data not Successfully Inserted " . $stmt->error;
+      }
+      }
   }
   elseif (!empty($_POST['questiontext'])) {
      $question = $_POST['questiontext'];
      $score = $_POST['score'];
      $type = 'single';
-      
-      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
-    if($stmt->execute()){
-       ?>
-     <script>
-      alert("Group Assignment saved successfully");
-     window.location.href = 'groupAssignment.php';
-     </script>
-     <?php
-    }
-    else{
-      ?>
-          <script>
+     
+     if (!empty($_POST['groupId'])) {
+      $groupMembers = $_POST['groupId'];
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,groupmembers,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+      $stmt->bind_param("sssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$groupMembers,$assignedDay,$submission,$score);
+      if($stmt->execute()){
+         ?><script>
+        alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
+       </script><?php
+      }
+      else{
+        ?><script>
               document.getElementById("message").innerHTML = "Group Assignment not saved.";
               document.getElementById("message").style.color = "red";
-          </script>
-          <?php
-      // echo "Data not Successfully Inserted " . $stmt->error;
+          </script><?php
+        // echo "Data not Successfully Inserted " . $stmt->error;
+      }
     }
-
+    else{
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
+      $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+      if($stmt->execute()){
+         ?><script>
+        alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
+       </script><?php
+      }
+      else{
+        ?><script>
+              document.getElementById("message").innerHTML = "Group Assignment not saved.";
+              document.getElementById("message").style.color = "red";
+          </script><?php
+        // echo "Data not Successfully Inserted " . $stmt->error;
+      }
+    }
   }
 }//End of validating if all the POST variables were sent
 else{

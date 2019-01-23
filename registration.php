@@ -1,10 +1,5 @@
-<?php
-require_once "Admin/connect.php";
-// Selecting all the available courses from database
-$querySelectCourse = "SELECT courseCode FROM course";  
-$resultSelectCourse = $conn->query($querySelectCourse);
+<?php include 'server.php'; ?>
 
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +10,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 <meta name="description" content="">
 <meta name="author" content="">
 <link rel="icon" href="favicon.jpeg">
-
+<link href="Admin/dashboard/css/login.css" rel="stylesheet">
 <!-- Bootstrap core CSS-->
     <link href="Admin/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -40,25 +35,30 @@ $resultSelectCourse = $conn->query($querySelectCourse);
 
 <div class="container div">
 	<!-- FORM CONTROLS-->
-	<form class="form-horizontal" method="POST" role="form" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">
+	<form class="form-horizontal" method="POST" role="form" action="registration.php">
+    <!-- Errors display here -->
+
 
     <div class="container">
       <div class="card card-register mx-auto mt-5">
+
         <div class="card-header">Register an Account</div>
         <div id="message" style="text-align: center; margin-top: 5px;"></div>
         <div class="card-body">
+          <?php include('errors.php'); ?>
+          <br />
           <form>
             <div class="form-group">
               <div class="form-row">
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="firstName" class="form-control" placeholder="First name" required="required" name="firstname" autofocus="autofocus">
+                    <input type="text" id="firstName" class="form-control" placeholder="First name" name="firstname" autofocus="autofocus">
                     <label for="firstName">First name</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="lastName" class="form-control" placeholder="Last name" required="required" name="lastname">
+                    <input type="text" id="lastName" class="form-control" placeholder="Last name" name="lastname">
                     <label for="lastName">Last name</label>
                   </div>
                 </div>
@@ -66,7 +66,7 @@ $resultSelectCourse = $conn->query($querySelectCourse);
             </div>
             <div class="form-group">
               <div class="form-label-group">
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="required" name="email">
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="email">
                 <label for="inputEmail">Email address</label>
               </div>
             </div>
@@ -74,13 +74,13 @@ $resultSelectCourse = $conn->query($querySelectCourse);
               <div class="form-row">
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="matricNum" class="form-control" placeholder="Matric Number" required="required" name="matric_num">
+                    <input type="text" id="matricNum" class="form-control" placeholder="Matric Number" name="matric_num">
                     <label for="matricNum">Matric Number</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="text" id="phoneNum" class="form-control" placeholder="Phone Number" required="required" name="phone">
+                    <input type="text" id="phoneNum" class="form-control" placeholder="Phone Number" name="phone">
                     <label for="phoneNum">Phone Number</label>
                   </div>
                 </div>
@@ -90,20 +90,20 @@ $resultSelectCourse = $conn->query($querySelectCourse);
               <div class="form-row">
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required" name="pword">
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password_1">
                     <label for="inputPassword">Password</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-label-group">
-                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" required="required" name="pword1">
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" name="password_2">
                     <label for="confirmPassword">Confirm password</label>
                   </div>
                 </div>
               </div>
             </div>
             
-            <button type="submit" name="submit" class="btn btn-primary btn-block">Register</button>
+            <button type="submit" name="register" class="btn btn-primary btn-block">Register</button>
           </form>
           <div class="text-center">
             <a class="d-block small mt-3" href="index.php">Login Page</a>
@@ -128,88 +128,3 @@ $resultSelectCourse = $conn->query($querySelectCourse);
  
 </body>
 </html>
-
-
-<?php
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-if (!empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['matric_num']) && !empty($_POST['phone']) && !empty($_POST['email'])  && !empty($_POST['pword'])) {
-  
-  $firstname = fix_string($_POST['firstname']);
-  $lastname= fix_string($_POST['lastname']);
-  $matricNum = fix_string($_POST['matric_num']);
-  $phone = fix_string($_POST['phone']);
-  $email = fix_string($_POST['email']);
-  $pass = fix_string($_POST['pword']);
-  $name = $firstname . " " . $lastname;
-  $semester = '1.1';
-
-  
-  // Hash encryption for protecting password in the database
-  $salt1 = "qm&h*";
-  $salt2 = "pg!@";
-  $passwrd = hash('ripemd128', "$salt1$pass$salt2");
-
-  // Checking if the course exists in database already
-  $querySelect = "SELECT* FROM student WHERE MatricNum = '$matricNum'";
-  $resultSelect = $conn->query($querySelect);
-  $rowNum = $resultSelect->num_rows;
-
-  if ($rowNum < 1) {
-    // Code to Insert the details of the new admin to database
-    $stmt = $conn->prepare("INSERT INTO student (Name,MatricNum,phone,email,password,current_semester) VALUES (?,?,?,?,?,?)");
-    $stmt->bind_param("ssssss",$name,$matricNum,$phone,$email,$passwrd,$semester);
-
-    if($stmt->execute()){
-      ?>
-     <script>
-      alert("Registration Successful, proceed to login");
-     window.location.href = 'index.php';
-     </script>
-     <?php
-    }
-    else{
-      echo "Data not Successfully Inserted" . $stmt->error;
-       ?>
-    <script>
-        document.getElementById("message").innerHTML = "Registration Not Successful, Please try again";
-        document.getElementById("message").style.color = "red";
-    </script>
-    <?php
-    }
-
-  }//End of what to perform when the course has not been registered yet
-
-  else{
-    echo "You have been registered already";
-    ?>
-    <script>
-        document.getElementById("message").innerHTML = "You have been Registered already";
-        document.getElementById("message").style.color = "red";
-    </script>
-    <?php
-
-  }//End of what to perform when the course is registered already
-
-}//End of validating that the POST variables are not empty
-else{
-?>
-      <script>
-        document.getElementById("message").innerHTML = "Text Fields cannot be empty";
-        document.getElementById("message").style.color = "red";
-    </script>
-<?php
-}
-}//End of validating that the request method is a POST method
-
-
-
-function fix_string($string)
-{
-if (get_magic_quotes_gpc()) $string = stripslashes($string);
-return htmlentities ($string);
-}
-
-
-?>

@@ -131,11 +131,11 @@
 		<!-- Form To upload the txt document-->
 		<form method="post" role="form" class="form-horizontal" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 			<input type="file" name="myfile">
-			<select name="group_name">
+			<select name="groupId">
 			<option value=''>--Select Group Name--</option>
 			<?php
 			while ($row = $resultGroups->fetch_assoc()) {
-				echo "<option value=".$row['group_name'].">".$row['group_name']."</option>";
+				echo "<option value=".$row['groupId'].">".$row['group_name']."</option>";
 			}
 			?>
 			</select>
@@ -155,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if (!empty($_POST['submit'])) {
 		if(!empty($_FILES["myfile"]["tmp_name"])){
 
-		$group_name = $_POST['group_name'];
+		$groupId = $_POST['groupId'];
 		$format = 'group';
 		$target_dir = "sub_ass_files/";
 		$target_file = $target_dir . basename($_FILES["myfile"]["name"]);
@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		    if (move_uploaded_file($_FILES["myfile"]["tmp_name"], $target_file)){
 
 		        $stmt = $conn->prepare("INSERT INTO assignmentsubmission(assignmentId,courseCode,matricNum,format,ass_file_path,status,date) VALUES (?,?,?,?,?,?,?)");
-			    $stmt->bind_param("sssssss",$assignmentId,$courseCode,$group_name,$format,$target_file,$status,$date);
+			    $stmt->bind_param("sssssss",$assignmentId,$courseCode,$groupId,$format,$target_file,$status,$date);
 
 			    if($stmt->execute()){
 			       ?>

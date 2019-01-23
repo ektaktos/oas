@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2018 at 03:33 PM
+-- Generation Time: Jan 23, 2019 at 03:51 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.1.18
 
@@ -39,7 +39,8 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`sn`, `username`, `password`) VALUES
-(1, 'admin', 'Admin01');
+(1, 'admin', 'Admin01'),
+(2, 'admin', '0f84138dd4bc2114a8750963895ddb25');
 
 -- --------------------------------------------------------
 
@@ -56,6 +57,13 @@ CREATE TABLE `announcement` (
   `visible` enum('0','1') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `announcement`
+--
+
+INSERT INTO `announcement` (`sn`, `title`, `content`, `tutor_id`, `date`, `visible`) VALUES
+(1, 'Announcement!', 'Attempt all question sent to U', 'Tim01', '2018-12-19 10:31:26', '1');
+
 -- --------------------------------------------------------
 
 --
@@ -70,6 +78,14 @@ CREATE TABLE `article` (
   `uploadedDate` datetime NOT NULL,
   `visible` enum('0','1') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `article`
+--
+
+INSERT INTO `article` (`sn`, `articleName`, `articlePath`, `tutorName`, `uploadedDate`, `visible`) VALUES
+(1, 'project', 'articles/employment of pharmacy.docx', 'Alabi Wale', '2018-12-19 10:30:52', '1'),
+(2, 'project', 'articles/zenoir.sql', 'Adegbite Oluwaseyi', '2018-12-28 12:34:02', '1');
 
 -- --------------------------------------------------------
 
@@ -87,10 +103,23 @@ CREATE TABLE `assignmentdetails` (
   `courseCode` varchar(15) NOT NULL,
   `type` enum('','single','multiple') NOT NULL,
   `format` enum('','individual','group') NOT NULL,
+  `groupmembers` varchar(250) NOT NULL,
   `dateAssigned` datetime NOT NULL,
   `submissionDate` datetime NOT NULL,
   `score` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `assignmentdetails`
+--
+
+INSERT INTO `assignmentdetails` (`sn`, `assignmentId`, `sub_AssId`, `assignmentQuestion`, `tutor`, `tutorId`, `courseCode`, `type`, `format`, `groupmembers`, `dateAssigned`, `submissionDate`, `score`) VALUES
+(1, 'GES102_Ass01', '', 'bkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', 'Alabi Wale', 'Tim01', 'GES_102', 'single', 'individual', '', '2018-12-19 10:34:30', '2018-12-19 11:00:00', 10),
+(2, 'CSC401_Ass01', '', 'jcjcggjcgjgjvjgcvjcgjgvvjvcghj', 'Oduwole Ayo', 'odus', 'CSC_401', 'single', 'individual', '', '2018-12-19 10:55:10', '2018-12-19 12:00:00', 10),
+(3, 'CSC341_Ass02', 'CSC341_Ass02_1', 'How old are you?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 2),
+(4, 'CSC341_Ass02', 'CSC341_Ass02_2', 'What is your name?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 4),
+(5, 'CSC341_Ass02', 'CSC341_Ass02_3', 'Who is your father?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 3),
+(6, 'CSC341_Ass02', 'CSC341_Ass02_4', 'Who are you?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 1);
 
 -- --------------------------------------------------------
 
@@ -161,16 +190,19 @@ INSERT INTO `course` (`sn`, `courseCode`, `courseName`, `unit`, `level`, `semest
 (12, 'CSC_361', 'Formal Theory of Computation and Automata ', 3, '300', 1, ''),
 (13, 'CSC_341', 'Introduction to Linux administration', 3, '300', 1, ''),
 (14, 'CSC_321', 'Introduction to Operations research', 3, '300', 1, ''),
-(15, 'CSC 351', ' Networks and Telecommunication', 3, '300', 1, ''),
-(16, 'CSC_381', 'Numerical Methods and Anakysis', 3, '300', 1, ''),
-(17, 'CSC_311', 'Operating Systems 2', 3, '300', 1, ''),
+(15, 'CSC_351', ' Networks and Telecommunication', 3, '300', 1, ''),
+(16, 'CSC_381', 'Numerical Methods and Analysis', 3, '300', 1, ''),
+(17, 'CSC_311', 'Operating Systems 2', 3, '300', 1, 'Odus'),
 (18, 'CSC_461', 'Artificial Intelligence', 2, '400', 1, ''),
 (19, 'CSC_401', 'Compiler Construction', 3, '400', 1, ''),
 (20, 'CSC_451', 'Data Security and Integrity', 3, '400', 1, ''),
 (21, 'CSC_421', 'Database Design and Management', 3, '400', 1, ''),
 (22, 'CSC_431', 'Fundamentals of Software Engineering', 3, '400', 1, ''),
 (23, 'CSC_411', 'Human Computer Interface', 2, '400', 1, ''),
-(24, 'CSC_441', 'Introduction to Analogue Computer', 2, '400', 1, '');
+(24, 'CSC_441', 'Introduction to Analogue Computer', 2, '400', 1, ''),
+(25, 'CHM_101', 'Chemistry', 2, '100', 1, ''),
+(26, 'CHM_111', 'Chemistry Practical', 2, '100', 1, ''),
+(27, 'MTH_112', 'Mathematics II', 3, '100', 2, '');
 
 -- --------------------------------------------------------
 
@@ -179,9 +211,8 @@ INSERT INTO `course` (`sn`, `courseCode`, `courseName`, `unit`, `level`, `semest
 --
 
 CREATE TABLE `group_members` (
-  `sn` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL,
   `group_name` varchar(25) NOT NULL,
-  `groupId` varchar(25) NOT NULL,
   `courseCode` varchar(15) NOT NULL,
   `members` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -199,9 +230,23 @@ CREATE TABLE `student` (
   `courses` varchar(150) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `email` varchar(45) NOT NULL,
+  `gender` varchar(9) NOT NULL,
+  `student_avatar` varchar(250) NOT NULL,
   `password` varchar(45) NOT NULL,
   `current_semester` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `student`
+--
+
+INSERT INTO `student` (`sn`, `Name`, `MatricNum`, `courses`, `phone`, `email`, `gender`, `student_avatar`, `password`, `current_semester`) VALUES
+(2, 'Oregunwa Segun', '15/0384', '[\"CSC_461\",\"CSC_401\",\"CSC_451\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\",\"CSC_341\"]', '08105444538', 'oregsgraphix@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '400'),
+(3, ' Piniki Endurance', '15/0385', '[\"CSC_461\",\"CSC_401\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\"]', '08105444538', 'oregsgraphix@gmail.com', '', '', 'd41d8cd98f00b204e9800998ecf8427e', ''),
+(5, 'Ogunbajo Michael', '12/0384', '', '08105444538', 'banjo@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '1.1'),
+(6, 'Adebambo  Paul', '16/0350', '', '0813748994', 'adebambo@gmail.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
+(7, 'Alabi Damilare', '15/0389', '', '0982939949', 'alabi@yahoo.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
+(8, 'Alade Ibukun', '12/0900', '[\"CSC_411\",\"CSC_441\"]', '090234566', 'alade@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '');
 
 -- --------------------------------------------------------
 
@@ -212,8 +257,8 @@ CREATE TABLE `student` (
 CREATE TABLE `tutor` (
   `sn` int(11) NOT NULL,
   `Name` varchar(45) NOT NULL,
-  `courses` varchar(150) NOT NULL,
   `StaffId` varchar(45) NOT NULL,
+  `courses` varchar(150) NOT NULL,
   `phone` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
   `password` varchar(45) NOT NULL
@@ -223,8 +268,9 @@ CREATE TABLE `tutor` (
 -- Dumping data for table `tutor`
 --
 
-INSERT INTO `tutor` (`sn`, `Name`, `courses`, `StaffId`, `phone`, `email`, `password`) VALUES
-(1, 'Alabi Wale', '[\"GES_102\",\"GES_101\"]', 'Tim01', '08101662910', 'tim01@gmail.com', 'ddc4295258a8253c08c9a88809c4e880');
+INSERT INTO `tutor` (`sn`, `Name`, `StaffId`, `courses`, `phone`, `email`, `password`) VALUES
+(2, 'Adegbite Oluwaseyi', 'seyi', '[\"CSC_341\",\"CSC_461\",\"CSC_411\"]', '08123449988', 'adegbiteseyi@gmail.com', '5e1bc091728e94cf976fb93a73174812'),
+(5, 'Oregunwa Segun', 'oregs', '[\"CSC_351\",\"CSC_461\",\"CSC_421\"]', '8105444538', 'oregsgraphix@gmail.com', '202cb962ac59075b964b07152d234b70');
 
 --
 -- Indexes for dumped tables
@@ -276,19 +322,21 @@ ALTER TABLE `course`
 -- Indexes for table `group_members`
 --
 ALTER TABLE `group_members`
-  ADD PRIMARY KEY (`sn`);
+  ADD PRIMARY KEY (`groupId`);
 
 --
 -- Indexes for table `student`
 --
 ALTER TABLE `student`
-  ADD PRIMARY KEY (`sn`);
+  ADD PRIMARY KEY (`sn`),
+  ADD UNIQUE KEY `MatricNum` (`MatricNum`);
 
 --
 -- Indexes for table `tutor`
 --
 ALTER TABLE `tutor`
-  ADD PRIMARY KEY (`sn`);
+  ADD PRIMARY KEY (`sn`),
+  ADD UNIQUE KEY `StaffId` (`StaffId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -298,25 +346,25 @@ ALTER TABLE `tutor`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `announcement`
 --
 ALTER TABLE `announcement`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `article`
 --
 ALTER TABLE `article`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `assignmentdetails`
 --
 ALTER TABLE `assignmentdetails`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `assignmentresult`
@@ -334,25 +382,25 @@ ALTER TABLE `assignmentsubmission`
 -- AUTO_INCREMENT for table `course`
 --
 ALTER TABLE `course`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `group_members`
 --
 ALTER TABLE `group_members`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `groupId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `student`
 --
 ALTER TABLE `student`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tutor`
 --
 ALTER TABLE `tutor`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

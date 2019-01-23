@@ -174,7 +174,7 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
       <?php } elseif(!empty($_SESSION['oas_studmatricNum'])){?>
 
         <li class="nav-item">
-          <a class="nav-link" href="registerCourse.php">
+          <a class="nav-link" href="course/registerCourse.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Register Course</span>
           </a>

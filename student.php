@@ -2,7 +2,7 @@
 // Validating that the Student is really logged in and authorized
 session_start();
 
-if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) {
+if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])){
   # What to perform if the student is really logged in
 
 require_once 'Admin/connect.php';
@@ -29,10 +29,12 @@ $resultAnnouncement = $conn->query($selectAnnouncement);
 $queryStudent = "SELECT Name,current_semester FROM student WHERE MatricNum = '$matricNum'";
 $resultStudent = $conn->query($queryStudent);
 
- while ($row = $resultStudent->fetch_assoc()) {
-        $studentName = $row['Name'];
-        $cur_level = $row['current_semester'];
-    }
+while ($row = $resultStudent->fetch_assoc()) {
+    $studentName = $row['Name'];
+    $cur_level = $row['current_semester'];
+}
+
+
 
  }
 
@@ -114,7 +116,7 @@ $resultStudent = $conn->query($queryStudent);
       <!-- Sidebar -->
       <ul class="sidebar navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="registerCourse.php">
+          <a class="nav-link" href="course/registerCourse.php">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Register Course</span>
           </a>
@@ -200,7 +202,7 @@ $resultStudent = $conn->query($queryStudent);
           
                 // Getting assignments that have been submitted but not graded from database
                 // Mysql Query to select the details of assignments from database
-                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND format = 'group'";
+                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND format = 'group' OR groupmembers LIKE '".$matricNum."'";
                 $resultQuestion = $conn->query($selectQuestion); 
 
                 if ($resultQuestion->num_rows < 1) {
@@ -342,8 +344,10 @@ $resultStudent = $conn->query($queryStudent);
                   echo "<span>Date Assigned: <b>".date("M j, Y",strtotime($row1['dateAssigned']))."</b></span><br>";
                   echo "<span>Submission Deadline: <b>".date("M j, Y",strtotime($row1['submissionDate']))."</b></span><br>";
                   echo "<span>Submission Time: <b>".date("h:ia",strtotime($row1['submissionDate']))."</b></span><br>";
-                  echo "<span>Expected Score: <b>".$row1['score']."</b></span>
-                  </div>";
+                  if ($row1['type'] == 'single') {
+                  echo "<span>Expected Score: <b>".$row1['score']."</b></span>";   
+                  }             
+                  echo "</div>";
                 echo "</div>";
                 echo "<a class='card-footer text-white clearfix small z-1' href='upload.php?Id=".$row1['assignmentId']."'>";
                   echo "<span class='float-left'>Submit Assignment</span>";

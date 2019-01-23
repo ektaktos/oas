@@ -1,3 +1,8 @@
+<?php 
+// Student log in credential
+require 'Admin/connect.php';
+
+?>
 <!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -49,8 +54,16 @@ return false
 }
 </script>
 
- <!-- Just an image -->
+<!-- style Sheet -->
+<style type="text/css">
+  body {
+    background:  url(Admin/dashboard/image/back.jpg) no-repeat;
+    background-size: 100%;
+    overflow: hidden;
+}
+</style>
 
+ <!-- Just an image -->
 
 <body class="bg-light">
   <nav class="navbar navbar-light bg-dark">
@@ -58,16 +71,20 @@ return false
     <img src="Admin/dashboard/image/logo.gif" width="50" height="50" alt="AU">
     <span style="color: white;">ASG System</span>
   </a>
+  <div class="navbar-right">
+    <a class="btn btn-primary" style="color:white;" href="cordinator/index.php">Student Login</a>
+  </div>
 </nav>
+
 <!-- Div container to contain the page -->
- <div class="container-fluid">
+ <div class="container-fluid" style="position: relative;left: 25%;">
 
 <div class="col-sm-12 row" style="margin-top: 50px;">
 <div class="col-sm-3">
 <div class="card card-login mx-auto mt-5">
         <div class="card-header">Tutor Login</div>
         <div class="card-body">
-          <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+          <form method="post" class="form-horizontal" role="form" action="index.php">
 
             <div class="form-group">
               <!-- <div class="form-label-group"> -->
@@ -83,12 +100,13 @@ return false
             </div>
             <div class="form-group">
             </div>
-            <button type="submit" name="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" name="login" class="btn btn-primary btn-block">Login</button>
+            <br />
+            <br />
           </form>
           <div class="text-center">
-            <!-- <a class="d-block small" href="forgot-password.html">Forgot Password?</a> -->
+            <a class="d-block small mt-3" href=""></a></div>
           </div>
-        </div>
       </div>
 </div>
 
@@ -96,7 +114,10 @@ return false
 <div class="card card-login mx-auto mt-5">
         <div class="card-header">Student Login</div>
         <div class="card-body">
-          <form method="post" class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onsubmit= "return validate(this)">
+
+            <? include 'errors.php'; ?>
+
+          <form method="post" class="form-horizontal" role="form" action="index.php">
             <div class="form-group">
                 <input type="text" name="oas_matricNum" class="form-control" placeholder="Matric number" required="required">
             </div>
@@ -107,31 +128,42 @@ return false
             </div>
             <div class="form-group">
             </div>
-            <button type="submit" name="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" name="login" class="btn btn-primary btn-block">Login</button>
           </form>
           <div class="text-center">
             <a class="d-block small mt-3" href="registration.php">Register an Account</a>
 <!--             <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
  -->          </div>
+          <div class="text-center">
+            <a class="d-block small mt-2" href="registration.php">Forgot Password</a>
+<!--             <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
+ -->      </div>
         </div>
       </div>
       </div>
-<div class="col-sm-6">
-  <img src="Admin/dashboard/image/back.jpg" class="img-fluid rounded">
-</div>
+<!-- <div class="col-sm-6">
+  <img src="../Admin/dashboard/image/back.jpg" class="img-fluid rounded">
+</div> -->
 </div>
 
 </div>
 <!-- Sticky Footer -->
-        <footer class="sticky-footer" style="margin-top: 120px; text-align: center;">
-          <div class="container my-auto">
-            <div class="my-auto">
-              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
-            </div>
-          </div>
-        </footer>
-    <!-- Scroll to Top Button-->
-<?php
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<nav class = "navbar navbar-default bg-dark">
+      <div class = "container-fluid" style="float:right;">
+        <div class="container navbar-right">
+        <label class = "navbar-text p navbar-right" style="color:white;">Assignment Submission & Grading System &copy; All rights reserved 2018</label>
+        </div>
+      </div>
+    </nav>
+  </body>
+  <?php
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -239,5 +271,16 @@ function validatePassword(){var a=document.getElementById('password').value; var
 function validateUsername(){var a=document.getElementById('username').value; var b=document.getElementById('username'); if(a == ""){document.getElementById('uname').innerHTML='<font color=red size=2><i>No username was Entered</i><font>';b.style.borderColor="red";} else if (/[^a-zA-Z0-9_-]/.test(a)){document.getElementById('uname').innerHTML='<font size=2 color=red><i>Only a-z, A-Z, 0-9, _ and - are required</i><font>';b.style.borderColor="red";} else{document.getElementById('uname').innerHTML=""; b.style.borderColor="green"; return ""}}
 </script>
 
-
-
+<script type="text/javascript">
+  $(document).on('click', '#cont', function(){
+    $('#content-data').html('');
+    $.ajax({
+      url:'editTutor.php',
+      type:'POST',
+      dataType:'html'
+    }).done(function(data){
+      $('#content-data').html('');
+      $('#content-data').html(data);
+    })
+  });
+</script>

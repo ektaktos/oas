@@ -357,12 +357,12 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       $subassId = $assignmentId.'_'.$i;
       
      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,sub_AssId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-      $stmt->bind_param("sssssssssss",$assId,$subassId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+      $stmt->bind_param("sssssssssss",$assignmentId,$subassId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
       if($stmt->execute()){
          ?>
      <script>
       alert("Assignment saved successfully");
-     // window.location.href = 'newAssignment.php';
+      window.location.href = 'newAssignment.php';
      </script>
      <?php
       }
@@ -373,7 +373,7 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
               document.getElementById("message").style.color = "red";
           </script>
           <?php
-        // echo "Data not Successfully Inserted " . $stmt->error;
+        echo "Data not Successfully Inserted " . $stmt->error;
       }
     }
   }
@@ -402,7 +402,7 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
               document.getElementById("message").style.color = "red";
           </script>
           <?php
-      // echo "Data not Successfully Inserted " . $stmt->error;
+      echo "Data not Successfully Inserted " . $stmt->error;
     }
 
   }
@@ -429,7 +429,7 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
               document.getElementById("message").style.color = "red";
           </script>
           <?php
-      // echo "Data not Successfully Inserted " . $stmt->error;
+      echo "Data not Successfully Inserted " . $stmt->error;
     }
 
   }
@@ -474,7 +474,7 @@ else{
 
     <!-- Bootstrap core JavaScript-->
     <script src="Admin/dashboard/vendor/jquery/jquery.min.js"></script>
-    <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!--    <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>-->
 
     <!-- Core plugin JavaScript-->
     <script src="Admin/dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
