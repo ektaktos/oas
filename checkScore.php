@@ -30,7 +30,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
   $queryStudent = "SELECT Name FROM student WHERE MatricNum = '$studmatric'";
 	$resultStudent = $conn->query($queryStudent);
 
-	$queryAssDetails = "SELECT assignmentQuestion,score,format FROM assignmentdetails WHERE assignmentId='$assignmentId'";
+	$queryAssDetails = "SELECT assignmentQuestion,score,format,type FROM assignmentdetails WHERE assignmentId='$assignmentId'";
 	$resultAssDetails = $conn->query($queryAssDetails);
 
  	// Mysql Query to select the details of assignments from database
@@ -49,6 +49,7 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
     	$question = $row['assignmentQuestion'];
     	$exp_score[] = $row['score'];
       $format = $row['format'];
+      $type = $row['type'];
     }
     $exp_score = array_sum($exp_score);
     
@@ -151,30 +152,36 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 <div class="offset-md-2 col-md-8">
 <p><strong>Course Name/Code:</strong> <?php echo str_replace('_',' ',$courseCode);  ?></p>
 <p><strong>Assignment Id:</strong> <?php echo $assignmentId;  ?></p>
-<p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
+
 <?php 
   if ($format == 'individual') {
-
-?>
-<p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
-
-<P><strong>Assignment File:</strong> <?=$answer?> </P>
-
-<p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
-
-	<?php
+    if($type == 'multiple'){
+    ?>
+    <p><strong>Assignment Type:</strong> Multiple Questions</p>
+    <p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
+    <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
+  	<?php
+    }elseif ($type == 'single') { 
+    ?>
+    <p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
+    <p><strong>Student Matric Number:</strong> <?php echo $matricNum; ?></p>
+    <P><strong>Assignment File:</strong> <?=$answer?> </P>
+    <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
+    <?php
+    }
 		if ($resultResult->num_rows > 0) {
 			echo "<p><strong>Score: </strong>".$graded_score."/".$exp_score."</p>";
 		}
     else{
       echo "<p><strong>Submission Status: </strong> Not Graded</p>";
-    } }elseif($format == 'group'){
+    } 
+  }elseif($format == 'group'){
     ?>
+    <p><strong>Assignment Title:</strong> <?php echo $question; ?></p>
     <p><strong>Group Name:</strong> <?php echo $matricNum; ?></p>
-
     <p><strong>Assignment File:</strong> <?=$answer?> </p>
-
     <p><strong>Expected Score:</strong> <?php echo $exp_score; ?></p>
+
     <?php
     if ($resultResult->num_rows > 0) {
       echo "<p><strong>Score: </strong>".$graded_score."/".$exp_score."</p>";
@@ -190,13 +197,13 @@ if (!empty($_SESSION['oas_studmatricNum']) && !empty($_SESSION['oas_studpos'])) 
 </div>
 
 <!-- Sticky Footer -->
-        <footer class="sticky-footer container-fluid">
-          <div class="container my-auto">
-            <div class="copyright my-auto">
-              <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
-            </div>
-          </div>
-        </footer>
+  <footer class="sticky-footer container-fluid">
+    <div class="container my-auto">
+      <div class="copyright my-auto">
+        <span>Assignment Submission & Grading System &copy; All rights reserved <?=date('Y')?></span>
+      </div>
+    </div>
+  </footer>
 
 
 </body> 

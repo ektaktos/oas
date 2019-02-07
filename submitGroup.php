@@ -80,30 +80,37 @@
 			$deadlineTime = date("h:ia",strtotime($row['submissionDate']));
 			$assignedScore = $row['score'];
 			if(!empty($row['file_path'])){
-			$filePath = $row['file_path'];
-			$arr = explode('/', $filePath);
-	        $ass_file = $arr[1];
+				$filePath = 1;
+	        }
+	        if (!empty($row['groupmembers'])) {
+	        	$groupmembers = $row['groupmembers'];
 	        }
 		}
-			
 		// Getting the details of the tutor from database too
 		$selectTutor = "SELECT* FROM tutor WHERE StaffId = '$tutorId'";
 		$resultTutor = $conn->query($selectTutor);
 
 		// Query to get the List of group names
-		$selectGroups = "SELECT group_name FROM group_members WHERE courseCode = '$courseCode'";
+		$selectGroups = "SELECT group_name,groupId FROM group_members WHERE courseCode = '$courseCode'";
 		$resultGroups = $conn->query($selectGroups);
 
 		while ($row = $resultTutor->fetch_assoc()) {
 			$tutorEmail = $row['email'];
 			$tutorPhone = $row['phone'];
 		}
-		echo "<table class='table table-bordered'>";
-		echo "<tr><td><strong>Assignment Question:</strong></td><td> ". $question."</td></tr>";
-		if (isset($filePath) == "") {
+		echo "<table class='table table-bordered' style='margin-top:30px;'>";
+		
+		if (isset($filePath)) {
+			echo "<tr><td><strong>Assignment File:</strong></td><td><a target='_blank' href='".$question."'>".$question."</a></td></tr>";
 		}
 		else{
-		echo "<tr><td><strong>Assignment File:</strong></td><td><a target='_blank' href='".$filePath."'>".$ass_file."</a></td></tr>";
+			echo "<tr><td><strong>Assignment Question:</strong></td><td> ". $question."</td></tr>";
+		}
+		if (isset($groupmembers) != "") {
+		echo "<tr><td><strong>Assignment Type:</strong></td><td>Individual Group Assignment</td></tr>";
+		echo "<tr><td><strong>Group Members:</strong></td><td>".$groupmembers."</td></tr>";
+		}else{
+		echo "<tr><td><strong>Assignment Type:</strong></td><td>General Group Assignment</td></tr>";
 		}
 		echo "<tr><td><strong>Assignment Id:</strong></td><td> " . $assignmentId ."</td></tr>";
 		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
@@ -130,16 +137,15 @@
 		?>
 		<!-- Form To upload the txt document-->
 		<form method="post" role="form" class="form-horizontal" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-			<input type="file" name="myfile">
-			<select name="groupId">
+			<input type="file" name="myfile" required="">
+			<select name="groupId" required="">
 			<option value=''>--Select Group Name--</option>
 			<?php
 			while ($row = $resultGroups->fetch_assoc()) {
-				echo "<option value=".$row['groupId'].">".$row['group_name']."</option>";
+				echo "<option value='".$row['groupId']."'>".$row['group_name']."</option>";
 			}
 			?>
 			</select>
-			<input type="hidden" name="subAssId" value="">
 			<input type="submit" name="submit" value="Upload" class="btn btn-primary">
 		</form>
 		<?php
@@ -156,8 +162,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		if(!empty($_FILES["myfile"]["tmp_name"])){
 
 		$groupId = $_POST['groupId'];
+		echo "Hello" . $groupId;
 		$format = 'group';
-		$target_dir = "sub_ass_files/";
+ 		$target_dir = "sub_ass_files/";
 		$target_file = $target_dir . basename($_FILES["myfile"]["name"]);
 
 		$uploadOk = 1;
@@ -191,6 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			    $stmt->bind_param("sssssss",$assignmentId,$courseCode,$groupId,$format,$target_file,$status,$date);
 
 			    if($stmt->execute()){
+			    	echo "Successful";
 			       ?>
 				     <script>
 				      alert("Assignment Submitted successfully");

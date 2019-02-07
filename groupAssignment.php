@@ -26,9 +26,6 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         $tutorName = $row['Name'];
     }
 
-    // Query to get the List of group names
-    $selectGroups = "SELECT group_name FROM group_members WHERE courseCode = '$courseCode'";
-    $resultGroups = $conn->query($selectGroups);
  }
 
  else{
@@ -175,7 +172,7 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
 
 
     <div class="form-group">
-      <select class="form-control" name="courseCode">
+      <select class="form-control" name="courseCode" id="courseCode">
         <option value="">--Select Course Code--</option>
         <?php
          foreach ($course_array as $course) {
@@ -184,15 +181,12 @@ if (!empty($_SESSION['oas_tutorId']) && !empty($_SESSION['oas_tutorpos'])) {
         ?>
       </select>
     </div>
-    <label>**Select the Group Name to assign different assignments to different gropus or leave empty for general assignments</label>
-    <select name="groupId">
-      <option value=''>--Select Group Name--</option>
-      <?php
-      while ($row = $resultGroups->fetch_assoc()) {
-        echo "<option value=".$row['members'].">".$row['group_name']."</option>";
-      }
-      ?>
-    </select>
+    <span style="color: green;">**Select the Group Name to assign different assignments to different groups or leave empty for general group assignments</span>
+    <div class="form-group">
+      <select name="groupId" class="form-control" id="groupId">
+        <option value=''>--Select Group Name--</option>
+      </select>
+    </div>
 
     <div class="form-group">
       <select class="form-control" name="assignmentId">
@@ -266,12 +260,12 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       $question = $target_dir . basename($_FILES["questionfile"]["name"]);
       move_uploaded_file($_FILES["questionfile"]["tmp_name"], $question);
       $score = $_POST['score'];
-      $type = 'single';
       // If the group assignment is peculiar to a group
       if (!empty($_POST['groupId'])) {
+         $type = 'multiple';
          $groupMembers = $_POST['groupId'];
-         $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,groupmembers,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("sssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$groupMembers,$assignedDay,$submission,$score);
+         $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,file_path,type,format,groupmembers,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,1,$type,$format,$groupMembers,$assignedDay,$submission,$score);
         if($stmt->execute()){
            ?><script>
           alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
@@ -286,8 +280,9 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
         }
       }
       else{
-        $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+        $type = 'single';
+        $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,file_path,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("sssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,1,$type,$format,$assignedDay,$submission,$score);
         if($stmt->execute()){
          ?><script>
         alert("Group Assignment saved successfully");window.location.href = 'groupAssignment.php';
@@ -385,4 +380,15 @@ else{
     <!-- Custom scripts for all pages-->
     <script src="Admin/dashboard/js/sb-admin.js"></script>
 
+    <script type="text/javascript">
+      $(document).ready(function() {
     
+      $('#courseCode').unbind('change');
+      $('#courseCode').change(function() {
+      var courseCode = $('#courseCode').val();
+      // $("#assTable").load('getSubmissions.php',{"courseCode":courseCode,"assId":assId,})
+      $("#groupId").load('getGroups.php',{"courseCode":courseCode,})
+      });
+
+      });
+    </script>

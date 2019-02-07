@@ -385,8 +385,8 @@ if ((!empty($_POST['question']) || !empty($_FILES["questionfile"]["tmp_name"]) |
       $score = $_POST['score'];
       $type = 'single';
 
-      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,$assignedDay,$submission,$score);
+      $stmt = $conn->prepare("INSERT INTO assignmentdetails(assignmentId,assignmentQuestion,tutor,tutorId,courseCode,type,format,file_path,dateAssigned,submissionDate,score) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssssss",$assignmentId,$question,$tutorName,$tutorId,$courseCode,$type,$format,1,$assignedDay,$submission,$score);
     if($stmt->execute()){
        ?>
      <script>

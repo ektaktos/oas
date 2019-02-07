@@ -202,8 +202,19 @@ while ($row = $resultStudent->fetch_assoc()) {
           
                 // Getting assignments that have been submitted but not graded from database
                 // Mysql Query to select the details of assignments from database
-                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND format = 'group' OR groupmembers LIKE '".$matricNum."'";
-                $resultQuestion = $conn->query($selectQuestion); 
+                $selectQuestion = "SELECT* FROM assignmentdetails WHERE format = 'group'";
+                $result = $conn->query($selectQuestion);
+
+                while ($row = $result->fetch_assoc()) {
+                  if ($row['type'] == 'single') {
+                    $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND format = 'group' ORDER BY sn desc";
+                    $resultQuestion = $conn->query($selectQuestion);
+                  }
+                  elseif ($row['type'] == 'multiple') {
+                    $selectQuestion = "SELECT* FROM assignmentdetails WHERE format = 'group' AND groupmembers LIKE '%".$matricNum."%' ORDER BY sn asc";
+                    $resultQuestion = $conn->query($selectQuestion);
+                  }
+                } 
 
                 if ($resultQuestion->num_rows < 1) {
                     // echo "Error" . $conn->error;
@@ -221,7 +232,7 @@ while ($row = $resultStudent->fetch_assoc()) {
                   if ($row1['type'] == 'single') {
                     echo "<span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>";
                   }else{
-                    echo "<span class='assignmentTitle'><b>Question: Multiple Question</b></span><br>";
+                    echo "<span class='assignmentTitle'><b>Question: ".$row1['assignmentQuestion']."</b></span><br>";
                   }
                  
                   echo "<span>Course Code: <b>".str_replace('_',' ',$row1['courseCode'])."</b></span><br>";
@@ -256,7 +267,7 @@ while ($row = $resultStudent->fetch_assoc()) {
           <?php
              
                 // Getting assignments that have been submitted but not graded from database
-                $querySelect = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND status='UnGraded' GROUP BY AssignmentId";
+                $querySelect = "SELECT* FROM assignmentsubmission WHERE matricNum='$matricNum' AND status='UnGraded' GROUP BY AssignmentId ORDER BY sn desc";
                 $resultSelect = $conn->query($querySelect);
                 $rownum = $resultSelect->num_rows;
              
@@ -316,7 +327,7 @@ while ($row = $resultStudent->fetch_assoc()) {
 
                 // Getting assignments that have not been submitted yet
                 // Mysql Query to select the details of assignments from database
-                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND assignmentId NOT IN ('$assignments_string') AND format = 'individual' GROUP BY AssignmentId";
+                $selectQuestion = "SELECT* FROM assignmentdetails WHERE courseCode IN ('$course_string') AND assignmentId NOT IN ('$assignments_string') AND format = 'individual' GROUP BY AssignmentId ORDER BY sn desc";
                 $resultQuestion = $conn->query($selectQuestion); 
 
                 if ($resultQuestion->num_rows < 1) {
@@ -375,10 +386,11 @@ while ($row = $resultStudent->fetch_assoc()) {
           <?php
              
           // Mysql Query to select all the Graded assignments from database
-          $selectSubmAssignment1 = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='Graded' GROUP BY AssignmentId";
+          $selectSubmAssignment1 = "SELECT* FROM assignmentsubmission WHERE courseCode IN ('$course_string') AND status='Graded' GROUP BY AssignmentId ORDER BY sn desc
+          ";
           $resultSubmAssignment1 = $conn->query($selectSubmAssignment1); 
 
-
+              $escore = 0;
               while ($row = $resultSubmAssignment1->fetch_assoc()) {
 
                 $assignmentId = $row['assignmentId'];
@@ -389,9 +401,10 @@ while ($row = $resultStudent->fetch_assoc()) {
                 $queryAssDetails = "SELECT assignmentQuestion,score FROM assignmentdetails WHERE assignmentId='$assignmentId'";
                 $resultAssDetails = $conn->query($queryAssDetails);
 
-                while ($row1 = $resultAssDetails->fetch_assoc()) {
+                while ($row1 = $resultAssDetails->fetch_array()) {
                     $expScore = $row1['score'];
                     $question = $row1['assignmentQuestion'];
+                    $escore += $expScore;
                 }
 
                  if (strpos($assignmentId, '_') !== false) {
@@ -418,7 +431,7 @@ while ($row = $resultStudent->fetch_assoc()) {
                   <span>Ass. Id: ".$assignmentId."</span><br>
                   <span>Course Code: ".str_replace('_',' ',$courseCode)."</span><br>
                   <span class='fileDetails'> Matric Num: ".$matricnum."</span><br>
-                  <span class='fileName'>Score: ".$obtScore."/".$expScore."</span><br>
+                  <span class='fileName'>Score: ".$obtScore."/".$escore."</span><br>
 
                   </div>";
                 echo "</div>";

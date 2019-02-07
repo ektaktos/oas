@@ -97,7 +97,7 @@
 			$tutorPhone = $row['phone'];
 		}
 		if ($type == 'single') {
-		echo "<table class='table table-bordered'>";
+		echo "<table class='table table-bordered' style='margin-top:30px;'>";
 		echo "<tr><td><strong>Assignment Question:</strong></td><td> ". $question."</td></tr>";
 		if (isset($filePath) == "") {
 		}
@@ -135,7 +135,7 @@
 		}
 
 		}elseif($type == 'multiple'){
-		echo "<table class='table table-bordered'>";
+		echo "<table class='table table-bordered' style='margin-top:30px;'>";
 		echo "<tr><td><strong>Assignment Id:</strong></td><td> " . $assignmentId ."</td></tr>";
 		echo "<tr><td><strong>Tutor Name:</strong></td><td> " . $tutor ."</td></tr>";
 		echo "<tr><td><strong>Course Code:</strong></td><td> " . str_replace('_',' ',$courseCode)."</td></tr>";
@@ -172,15 +172,15 @@
             $rownum = $resultQuestion->num_rows;  $i = 0; $j=1;
             while ($row1 = $resultQuestion->fetch_assoc()) {
             	?>
-			<form method="post" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+			<form>
 			<div class="row">
 			 <div class="col-sm-4"><b>Question <?=$j?>:</b> <?=$row1['assignmentQuestion']?></div>
 			 <div class="col-sm-4">
-			 <textarea class="form-control" name="answer" Placeholder="Enter the Answer Here" rows="5" cols="10"></textarea>
+			 <textarea class="form-control answer" name="answer" Placeholder="Enter the Answer Here" rows="5" cols="10" id=""></textarea>
 			 </div>
-			 <input type="hidden" name="subAssId" value="<?=$row1['sub_AssId']?>">
+			 <input type="hidden" name="subAssId" value="<?=$row1['sub_AssId']?>" class='sub_AssId'>
 			 <div class="col-sm-2">
-			 	<input type="submit" name="submit" value="Submit" class="btn btn-primary">
+			 	<input type="submit" name="submit" value="Submit" id="multiplesub" class="btn btn-primary">
 			 </div>
 			 <div class="col-sm-2"><b>Assigned Score:</b> <?=$row1['score']?></div>
 			 </div>
@@ -303,6 +303,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
         </footer>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="Admin/dashboard/vendor/jquery/jquery.min.js"></script>
+    <script src="Admin/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+      $('#multiplesub').click(function(event){
+      	event.preventDefault();
+      	var subAssId = $('.sub_AssId').val();
+      	var answer = $('.answer').val();
+      	var assId = '<?=$assignmentId;?>';
+      	var course = '<?=$courseCode;?>'
+      	var matric = '<?=$matricNum;?>'
+      	$.ajax({
+      		url: 'submitMultiple.php',
+      		method: 'POST',
+      		data: {answer:answer, subAssId: subAssId, assId: assId, course:course, matric:matric},
+      		success: function(response){ console.log(response)
+      			location.reload();
+      		},
+      		error: function(response){console.log(response)}
+      	});
+      })
+    </script>
 
 
 </body>

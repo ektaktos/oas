@@ -4,7 +4,7 @@ if (isset($_REQUEST['courseCode'])) {
 
 require_once "Admin/connect.php";
 	$courseCode = $_REQUEST['courseCode'];
-	$selectSubmAssignment = "SELECT* FROM student";
+	$selectSubmAssignment = "SELECT courses,MatricNum,Name FROM student";
 	$result = $conn->query($selectSubmAssignment); 
 	while ($row = $result->fetch_assoc()) {
 		$course = json_decode($row['courses']);

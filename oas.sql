@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 23, 2019 at 03:51 PM
+-- Generation Time: Feb 07, 2019 at 12:26 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.1.18
 
@@ -57,13 +57,6 @@ CREATE TABLE `announcement` (
   `visible` enum('0','1') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `announcement`
---
-
-INSERT INTO `announcement` (`sn`, `title`, `content`, `tutor_id`, `date`, `visible`) VALUES
-(1, 'Announcement!', 'Attempt all question sent to U', 'Tim01', '2018-12-19 10:31:26', '1');
-
 -- --------------------------------------------------------
 
 --
@@ -101,6 +94,7 @@ CREATE TABLE `assignmentdetails` (
   `tutor` varchar(45) NOT NULL,
   `tutorId` varchar(15) NOT NULL,
   `courseCode` varchar(15) NOT NULL,
+  `file_path` varchar(5) NOT NULL,
   `type` enum('','single','multiple') NOT NULL,
   `format` enum('','individual','group') NOT NULL,
   `groupmembers` varchar(250) NOT NULL,
@@ -108,18 +102,6 @@ CREATE TABLE `assignmentdetails` (
   `submissionDate` datetime NOT NULL,
   `score` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `assignmentdetails`
---
-
-INSERT INTO `assignmentdetails` (`sn`, `assignmentId`, `sub_AssId`, `assignmentQuestion`, `tutor`, `tutorId`, `courseCode`, `type`, `format`, `groupmembers`, `dateAssigned`, `submissionDate`, `score`) VALUES
-(1, 'GES102_Ass01', '', 'bkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', 'Alabi Wale', 'Tim01', 'GES_102', 'single', 'individual', '', '2018-12-19 10:34:30', '2018-12-19 11:00:00', 10),
-(2, 'CSC401_Ass01', '', 'jcjcggjcgjgjvjgcvjcgjgvvjvcghj', 'Oduwole Ayo', 'odus', 'CSC_401', 'single', 'individual', '', '2018-12-19 10:55:10', '2018-12-19 12:00:00', 10),
-(3, 'CSC341_Ass02', 'CSC341_Ass02_1', 'How old are you?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 2),
-(4, 'CSC341_Ass02', 'CSC341_Ass02_2', 'What is your name?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 4),
-(5, 'CSC341_Ass02', 'CSC341_Ass02_3', 'Who is your father?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 3),
-(6, 'CSC341_Ass02', 'CSC341_Ass02_4', 'Who are you?', 'Adegbite Oluwaseyi', 'seyi', 'CSC_341', 'multiple', 'individual', '', '2019-01-09 12:27:07', '2019-01-23 12:45:00', 1);
 
 -- --------------------------------------------------------
 
@@ -146,12 +128,12 @@ CREATE TABLE `assignmentresult` (
 
 CREATE TABLE `assignmentsubmission` (
   `sn` int(11) NOT NULL,
-  `assignmentId` varchar(15) NOT NULL,
-  `sub_AssId` varchar(10) NOT NULL,
+  `assignmentId` varchar(25) NOT NULL,
+  `sub_AssId` varchar(25) NOT NULL,
   `courseCode` varchar(15) NOT NULL,
   `matricNum` varchar(15) NOT NULL,
   `format` enum('','individual','group') NOT NULL,
-  `ass_file_path` varchar(45) NOT NULL,
+  `ass_file_path` varchar(100) NOT NULL,
   `ass_answer` text NOT NULL,
   `status` varchar(15) NOT NULL,
   `date` datetime NOT NULL
@@ -243,9 +225,9 @@ CREATE TABLE `student` (
 INSERT INTO `student` (`sn`, `Name`, `MatricNum`, `courses`, `phone`, `email`, `gender`, `student_avatar`, `password`, `current_semester`) VALUES
 (2, 'Oregunwa Segun', '15/0384', '[\"CSC_461\",\"CSC_401\",\"CSC_451\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\",\"CSC_341\"]', '08105444538', 'oregsgraphix@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '400'),
 (3, ' Piniki Endurance', '15/0385', '[\"CSC_461\",\"CSC_401\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\"]', '08105444538', 'oregsgraphix@gmail.com', '', '', 'd41d8cd98f00b204e9800998ecf8427e', ''),
-(5, 'Ogunbajo Michael', '12/0384', '', '08105444538', 'banjo@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '1.1'),
-(6, 'Adebambo  Paul', '16/0350', '', '0813748994', 'adebambo@gmail.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
-(7, 'Alabi Damilare', '15/0389', '', '0982939949', 'alabi@yahoo.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
+(5, 'Ogunbajo Michael', '12/0384', '[\"CSC_461\",\"CSC_401\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\"]', '08105444538', 'banjo@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '1.1'),
+(6, 'Adebambo  Paul', '16/0350', '[\"CSC_461\",\"CSC_401\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\"]', '0813748994', 'adebambo@gmail.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
+(7, 'Alabi Damilare', '15/0389', '[\"CSC_461\",\"CSC_401\",\"CSC_421\",\"CSC_431\",\"CSC_411\",\"CSC_441\"]', '0982939949', 'alabi@yahoo.com', '', '', '202cb962ac59075b964b07152d234b70', ''),
 (8, 'Alade Ibukun', '12/0900', '[\"CSC_411\",\"CSC_441\"]', '090234566', 'alade@gmail.com', '', '', '5e1bc091728e94cf976fb93a73174812', '');
 
 -- --------------------------------------------------------
@@ -352,7 +334,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `announcement`
 --
 ALTER TABLE `announcement`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `article`
@@ -364,7 +346,7 @@ ALTER TABLE `article`
 -- AUTO_INCREMENT for table `assignmentdetails`
 --
 ALTER TABLE `assignmentdetails`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `assignmentresult`
